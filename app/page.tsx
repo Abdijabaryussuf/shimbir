@@ -5,135 +5,82 @@ import { useState } from "react";
 
 type Role = "student" | "teacher" | "parent" | "admin";
 
-type DemoUser = {
-  username: string;
-  password: string;
-  name: string;
-  role: Role;
-};
-
-const demoUsers: DemoUser[] = [
+const roles = [
   {
-    username: "salma",
-    password: "shimbir",
-    name: "Salma",
-    role: "student",
+    id: "student" as Role,
+    name: "Student",
+    icon: "🎒",
+    description: "Learn, practice, and play",
   },
   {
-    username: "tijaabo",
-    password: "tijaabi",
-    name: "Tijaabo",
-    role: "teacher",
+    id: "teacher" as Role,
+    name: "Teacher",
+    icon: "📚",
+    description: "Teach and track your class",
   },
   {
-    username: "amina",
-    password: "shimbir",
-    name: "Amina",
-    role: "parent",
+    id: "parent" as Role,
+    name: "Parent",
+    icon: "🏠",
+    description: "Follow your child's journey",
   },
   {
-    username: "admin",
-    password: "shimbir",
-    name: "Shimbir Admin",
-    role: "admin",
+    id: "admin" as Role,
+    name: "Admin",
+    icon: "⚙️",
+    description: "Manage Shimbir",
   },
 ];
 
-type Game = "train" | "blocks" | "birds" | null;
-
 export default function Home() {
-  const [loggedInUser, setLoggedInUser] = useState<DemoUser | null>(null);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState<Role | null>(null);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
+  const [error, setError] = useState("");
 
-  const [game, setGame] = useState<Game>(null);
-  const [stars, setStars] = useState(12);
-  const [celebration, setCelebration] = useState(false);
-
-  const [redCars, setRedCars] = useState(2);
-  const [blueCars, setBlueCars] = useState(3);
-
-  const [tens, setTens] = useState(2);
-  const [ones, setOnes] = useState(4);
-
-  const [birdAnswer, setBirdAnswer] = useState<number | null>(null);
-
-  function handleLogin() {
-    const user = demoUsers.find(
-      (item) =>
-        item.username.toLowerCase() === username.trim().toLowerCase() &&
-        item.password === password
-    );
-
-    if (!user) {
-      setLoginError(
-        "We couldn't find that account. Check your username and password."
-      );
-      return;
+  function login() {
+    if (
+      username.trim().toLowerCase() === "shimbir" &&
+      password === "shimbir123"
+    ) {
+      setLoggedIn(true);
+      setError("");
+    } else {
+      setError("Incorrect username or password.");
     }
-
-    setLoggedInUser(user);
-    setLoginError("");
   }
 
   function logout() {
-    setLoggedInUser(null);
+    setLoggedIn(false);
+    setRole(null);
     setUsername("");
     setPassword("");
-    setGame(null);
-    setLoginError("");
-  }
-
-  function celebrate() {
-    setStars((current) => current + 5);
-    setCelebration(true);
-
-    setTimeout(() => {
-      setCelebration(false);
-    }, 3500);
-  }
-
-  function checkTrain() {
-    if (redCars + blueCars === 8) {
-      celebrate();
-    }
-  }
-
-  function checkNumber() {
-    if (tens * 10 + ones === 24) {
-      celebrate();
-    }
-  }
-
-  function checkBirds() {
-    if (birdAnswer === 6) {
-      celebrate();
-    }
-  }
-
-  function resetGame() {
-    setGame(null);
-    setRedCars(2);
-    setBlueCars(3);
-    setTens(2);
-    setOnes(4);
-    setBirdAnswer(null);
+    setError("");
   }
 
   /*
-   * LOGIN PAGE
+   * STEP 1
+   * LOGIN
    */
 
-  if (!loggedInUser) {
+  if (!loggedIn) {
     return (
       <main className="loginPage">
-        <div className="loginBackgroundBird birdOne">🐦</div>
-        <div className="loginBackgroundBird birdTwo">🦅</div>
+        <div className="loginBackgroundBird birdOne">
+          🐦
+        </div>
+
+        <div className="loginBackgroundBird birdTwo">
+          🦅
+        </div>
 
         <section className="loginCard">
-          <div className="loginLogo">🐦</div>
+
+          <div className="loginLogo">
+            🐦
+          </div>
 
           <h1>SHIMBIR</h1>
 
@@ -143,49 +90,64 @@ export default function Home() {
 
           <div className="loginWelcome">
             <h2>Welcome back! 👋</h2>
-            <p>Sign in to continue your learning journey.</p>
+
+            <p>
+              Sign in to your Shimbir account.
+            </p>
           </div>
 
           <div className="formGroup">
-            <label htmlFor="username">Username</label>
+
+            <label htmlFor="username">
+              Username
+            </label>
 
             <input
               id="username"
               type="text"
               value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              placeholder="Enter your username"
+              onChange={(event) =>
+                setUsername(event.target.value)
+              }
+              placeholder="Enter username"
               autoComplete="username"
             />
+
           </div>
 
           <div className="formGroup">
-            <label htmlFor="password">Password</label>
+
+            <label htmlFor="password">
+              Password
+            </label>
 
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter your password"
+              onChange={(event) =>
+                setPassword(event.target.value)
+              }
+              placeholder="Enter password"
               autoComplete="current-password"
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
-                  handleLogin();
+                  login();
                 }
               }}
             />
+
           </div>
 
-          {loginError && (
+          {error && (
             <div className="loginError">
-              ⚠️ {loginError}
+              ⚠️ {error}
             </div>
           )}
 
           <button
             className="loginButton"
-            onClick={handleLogin}
+            onClick={login}
           >
             LOG IN 🚀
           </button>
@@ -193,14 +155,16 @@ export default function Home() {
           <button
             className="qrButton"
             onClick={() =>
-              alert("QR code sign-in will be connected to Shimbir accounts.")
+              alert(
+                "QR code login will be connected to Shimbir accounts."
+              )
             }
           >
             ▣ Sign in with QR code
           </button>
 
           <div className="loginDivider">
-            <span>Shimbir accounts</span>
+            <span>One Shimbir account</span>
           </div>
 
           <div className="roles">
@@ -211,545 +175,429 @@ export default function Home() {
           </div>
 
           <div className="demoAccounts">
-            <strong>Demo accounts</strong>
-            <p>Student: salma / shimbir</p>
-            <p>Teacher: tijaabo / tijaabi</p>
-            <p>Parent: amina / shimbir</p>
-            <p>Admin: admin / shimbir</p>
+            <strong>Demo login</strong>
+
+            <p>
+              Username: <b>shimbir</b>
+            </p>
+
+            <p>
+              Password: <b>shimbir123</b>
+            </p>
           </div>
+
         </section>
       </main>
     );
   }
 
   /*
-   * STUDENT DASHBOARD
+   * STEP 2
+   * CHOOSE ROLE
+   *
+   * This is temporary.
+   * The database will determine this automatically later.
    */
 
-  if (loggedInUser.role === "student") {
+  if (!role) {
     return (
-      <main className="app">
-        <header className="topbar">
-          <div className="brand">
-            <span className="brandBird">🐦</span>
-            <span className="brandName">SHIMBIR</span>
+      <main className="rolePage">
+
+        <section className="roleCard">
+
+          <div className="smallLogo">
+            🐦
           </div>
 
-          <div className="studentTop">
-            <div className="topStars">⭐ {stars}</div>
+          <h1>Who are you?</h1>
 
-            <button className="logoutButton" onClick={logout}>
-              Log out
-            </button>
+          <p>
+            Choose a role to preview the Shimbir dashboard.
+          </p>
+
+          <div className="roleGrid">
+
+            {roles.map((item) => (
+              <button
+                key={item.id}
+                className="roleChoice"
+                onClick={() => setRole(item.id)}
+              >
+
+                <div className="roleIcon">
+                  {item.icon}
+                </div>
+
+                <strong>
+                  {item.name}
+                </strong>
+
+                <span>
+                  {item.description}
+                </span>
+
+              </button>
+            ))}
+
           </div>
-        </header>
 
-        {!game && (
-          <section className="main">
-            <div className="accountBadge">
-              🎒 Student Account
-            </div>
+          <button
+            className="logoutFromRole"
+            onClick={logout}
+          >
+            ← Log out
+          </button>
 
-            <div className="welcome">
-              <div>
-                <h1>Hi, {loggedInUser.name}! 👋</h1>
-                <p>
-                  Ready to learn, play, and fly higher?
-                </p>
-              </div>
+        </section>
 
-              <div className="welcomeBird">🦅</div>
-            </div>
-
-            <section className="journey">
-              <h2>Your Flight Journey</h2>
-
-              <div className="flightPath">
-                <div className="birdLevel active">
-                  <div className="birdEmoji">🐦</div>
-                  <strong>Kestrel</strong>
-                  <small>Level 1</small>
-                </div>
-
-                <div className="line done" />
-
-                <div className="birdLevel">
-                  <div className="birdEmoji">🦅</div>
-                  <strong>Hawk</strong>
-                  <small>Level 2</small>
-                </div>
-
-                <div className="line" />
-
-                <div className="birdLevel">
-                  <div className="birdEmoji">🦅</div>
-                  <strong>Eagle</strong>
-                  <small>Level 3</small>
-                </div>
-
-                <div className="line" />
-
-                <div className="birdLevel">
-                  <div className="birdEmoji">🦅</div>
-                  <strong>Gyrfalcon</strong>
-                  <small>Level 4</small>
-                </div>
-
-                <div className="line" />
-
-                <div className="birdLevel">
-                  <div className="birdEmoji">⚡</div>
-                  <strong>Peregrine</strong>
-                  <small>Goal</small>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="sectionTitle">
-                🎮 Math Playground
-              </h2>
-
-              <div className="games">
-                <div className="gameCard">
-                  <div className="gameIcon">🚂</div>
-
-                  <div>
-                    <h3>Train Builder</h3>
-                    <p>Addition & Counting</p>
-                  </div>
-
-                  <button onClick={() => setGame("train")}>
-                    PLAY →
-                  </button>
-                </div>
-
-                <div className="gameCard">
-                  <div className="gameIcon">🔟</div>
-
-                  <div>
-                    <h3>Build the Number</h3>
-                    <p>Place Value</p>
-                  </div>
-
-                  <button onClick={() => setGame("blocks")}>
-                    PLAY →
-                  </button>
-                </div>
-
-                <div className="gameCard">
-                  <div className="gameIcon">🐦</div>
-
-                  <div>
-                    <h3>Bird Count</h3>
-                    <p>Counting & Comparing</p>
-                  </div>
-
-                  <button onClick={() => setGame("birds")}>
-                    PLAY →
-                  </button>
-                </div>
-              </div>
-            </section>
-          </section>
-        )}
-
-        {game === "train" && (
-          <section className="gameArea">
-            <div className="gameHeader">
-              <button className="closeButton" onClick={resetGame}>
-                ← Back
-              </button>
-
-              <div>⭐ {stars}</div>
-            </div>
-
-            <div className="question">
-              <span>🚂</span>
-              <h1>The train has 5 cars.</h1>
-              <p>Add 3 more cars!</p>
-            </div>
-
-            <div className="train">
-              <div className="trainEngine">🚂</div>
-
-              {Array.from({
-                length: redCars + blueCars,
-              }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`trainCar ${
-                    index < redCars ? "redCar" : "blueCar"
-                  }`}
-                >
-                  {index < redCars ? "🔴" : "🔵"}
-                </div>
-              ))}
-            </div>
-
-            <div className="answerBox">
-              <strong>Total cars: {redCars + blueCars}</strong>
-            </div>
-
-            <div className="controls">
-              <div>
-                <h3>Red cars</h3>
-
-                <button
-                  className="controlButton redControl"
-                  onClick={() =>
-                    setRedCars((number) =>
-                      Math.max(0, number - 1)
-                    )
-                  }
-                >
-                  −
-                </button>
-
-                <span>{redCars}</span>
-
-                <button
-                  className="controlButton redControl"
-                  onClick={() =>
-                    setRedCars((number) => number + 1)
-                  }
-                >
-                  +
-                </button>
-              </div>
-
-              <div>
-                <h3>Blue cars</h3>
-
-                <button
-                  className="controlButton blueControl"
-                  onClick={() =>
-                    setBlueCars((number) =>
-                      Math.max(0, number - 1)
-                    )
-                  }
-                >
-                  −
-                </button>
-
-                <span>{blueCars}</span>
-
-                <button
-                  className="controlButton blueControl"
-                  onClick={() =>
-                    setBlueCars((number) => number + 1)
-                  }
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <button className="checkButton" onClick={checkTrain}>
-              CHECK MY TRAIN 🚂
-            </button>
-          </section>
-        )}
-
-        {game === "blocks" && (
-          <section className="gameArea">
-            <div className="gameHeader">
-              <button className="closeButton" onClick={resetGame}>
-                ← Back
-              </button>
-
-              <div>⭐ {stars}</div>
-            </div>
-
-            <div className="question">
-              <span>🔟</span>
-              <h1>Build the number 24</h1>
-              <p>Use tens and ones.</p>
-            </div>
-
-            <div className="baseTen">
-              <div className="tensGroup">
-                <h3>Tens</h3>
-
-                {Array.from({ length: tens }).map((_, index) => (
-                  <div className="tenBlock" key={index}>
-                    10
-                  </div>
-                ))}
-              </div>
-
-              <div className="onesGroup">
-                <h3>Ones</h3>
-
-                {Array.from({ length: ones }).map((_, index) => (
-                  <div className="oneBlock" key={index}>
-                    1
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="answerBox">
-              <strong>
-                {tens} tens + {ones} ones ={" "}
-                {tens * 10 + ones}
-              </strong>
-            </div>
-
-            <div className="controls">
-              <div>
-                <h3>Tens</h3>
-
-                <button
-                  className="controlButton"
-                  onClick={() =>
-                    setTens((number) =>
-                      Math.max(0, number - 1)
-                    )
-                  }
-                >
-                  −
-                </button>
-
-                <span>{tens}</span>
-
-                <button
-                  className="controlButton"
-                  onClick={() =>
-                    setTens((number) => number + 1)
-                  }
-                >
-                  +
-                </button>
-              </div>
-
-              <div>
-                <h3>Ones</h3>
-
-                <button
-                  className="controlButton"
-                  onClick={() =>
-                    setOnes((number) =>
-                      Math.max(0, number - 1)
-                    )
-                  }
-                >
-                  −
-                </button>
-
-                <span>{ones}</span>
-
-                <button
-                  className="controlButton"
-                  onClick={() =>
-                    setOnes((number) => number + 1)
-                  }
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <button className="checkButton" onClick={checkNumber}>
-              CHECK MY NUMBER 🔢
-            </button>
-          </section>
-        )}
-
-        {game === "birds" && (
-          <section className="gameArea birdGame">
-            <div className="gameHeader">
-              <button className="closeButton" onClick={resetGame}>
-                ← Back
-              </button>
-
-              <div>⭐ {stars}</div>
-            </div>
-
-            <div className="question">
-              <span>🐦</span>
-              <h1>How many birds?</h1>
-              <p>Count carefully!</p>
-            </div>
-
-            <div className="flyingBirds">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <span key={index}>🐦</span>
-              ))}
-            </div>
-
-            <div className="choiceGrid">
-              {[4, 5, 6, 7].map((number) => (
-                <button
-                  key={number}
-                  className={`choice ${
-                    birdAnswer === number ? "selected" : ""
-                  }`}
-                  onClick={() => setBirdAnswer(number)}
-                >
-                  {number}
-                </button>
-              ))}
-            </div>
-
-            <button className="checkButton" onClick={checkBirds}>
-              CHECK MY ANSWER 🐦
-            </button>
-          </section>
-        )}
-
-        {celebration && (
-          <div className="celebration">
-            <div className="celebrationContent">
-              <div className="bigStars">⭐ ⭐ ⭐</div>
-
-              <h1>AMAZING! 🎉</h1>
-
-              <p>You mastered it!</p>
-
-              <div className="reward">+5 ⭐</div>
-
-              <div className="star">⭐</div>
-            </div>
-          </div>
-        )}
       </main>
     );
   }
 
   /*
-   * TEACHER / PARENT / ADMIN DASHBOARD
+   * STUDENT
    */
 
-  const roleLabels = {
-    teacher: "Teacher",
-    parent: "Parent",
-    admin: "Administrator",
+  if (role === "student") {
+    return (
+      <main className="app">
+
+        <header className="topbar">
+
+          <div className="brand">
+            <span className="brandBird">
+              🐦
+            </span>
+
+            <span className="brandName">
+              SHIMBIR
+            </span>
+          </div>
+
+          <div className="studentTop">
+
+            <div className="topStars">
+              ⭐ 12
+            </div>
+
+            <button
+              className="logoutButton"
+              onClick={logout}
+            >
+              Log out
+            </button>
+
+          </div>
+
+        </header>
+
+        <section className="main">
+
+          <div className="accountBadge">
+            🎒 Student Account
+          </div>
+
+          <div className="welcome">
+
+            <div>
+
+              <h1>
+                Hi, Salma! 👋
+              </h1>
+
+              <p>
+                Ready to learn, master, and fly higher?
+              </p>
+
+            </div>
+
+            <div className="welcomeBird">
+              🦅
+            </div>
+
+          </div>
+
+          <section className="journey">
+
+            <h2>
+              Your Shimbir Journey
+            </h2>
+
+            <div className="flightPath">
+
+              <div className="birdLevel active">
+
+                <div className="birdEmoji">
+                  🐦
+                </div>
+
+                <strong>
+                  Kestrel
+                </strong>
+
+              </div>
+
+              <div className="line done" />
+
+              <div className="birdLevel">
+
+                <div className="birdEmoji">
+                  🦅
+                </div>
+
+                <strong>
+                  Hawk
+                </strong>
+
+              </div>
+
+              <div className="line" />
+
+              <div className="birdLevel">
+
+                <div className="birdEmoji">
+                  🦅
+                </div>
+
+                <strong>
+                  Eagle
+                </strong>
+
+              </div>
+
+              <div className="line" />
+
+              <div className="birdLevel">
+
+                <div className="birdEmoji">
+                  🦅
+                </div>
+
+                <strong>
+                  Gyrfalcon
+                </strong>
+
+              </div>
+
+              <div className="line" />
+
+              <div className="birdLevel">
+
+                <div className="birdEmoji">
+                  ⚡
+                </div>
+
+                <strong>
+                  Peregrine
+                </strong>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <h2 className="sectionTitle">
+            🎮 Math Playground
+          </h2>
+
+          <div className="games">
+
+            <div className="gameCard">
+
+              <div className="gameIcon">
+                🚂
+              </div>
+
+              <h3>
+                Train Builder
+              </h3>
+
+              <p>
+                Practice counting and addition.
+              </p>
+
+              <button>
+                PLAY 🚂
+              </button>
+
+            </div>
+
+            <div className="gameCard">
+
+              <div className="gameIcon">
+                🔟
+              </div>
+
+              <h3>
+                Build the Number
+              </h3>
+
+              <p>
+                Explore tens and ones.
+              </p>
+
+              <button>
+                PLAY 🔟
+              </button>
+
+            </div>
+
+            <div className="gameCard">
+
+              <div className="gameIcon">
+                🐦
+              </div>
+
+              <h3>
+                Bird Count
+              </h3>
+
+              <p>
+                Count birds and find the answer.
+              </p>
+
+              <button>
+                PLAY 🐦
+              </button>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+    );
+  }
+
+  /*
+   * TEACHER / PARENT / ADMIN
+   */
+
+  const dashboardData = {
+    teacher: {
+      title: "Teacher Dashboard",
+      icon: "📚",
+      greeting: "Welcome, Teacher! 👋",
+      cards: [
+        ["👩‍🎓", "My Students", "View student learning and mastery."],
+        ["📝", "Assignments", "Create and manage assignments."],
+        ["🎬", "Lessons", "Upload and organize lessons."],
+        ["📊", "Progress", "Monitor classroom progress."],
+      ],
+    },
+
+    parent: {
+      title: "Parent Dashboard",
+      icon: "🏠",
+      greeting: "Welcome, Parent! 👋",
+      cards: [
+        ["👧", "My Children", "View your child's journey."],
+        ["📊", "Progress", "See math learning progress."],
+        ["⭐", "Achievements", "View stars and milestones."],
+        ["💬", "Messages", "Connect with the teacher."],
+      ],
+    },
+
+    admin: {
+      title: "Admin Dashboard",
+      icon: "⚙️",
+      greeting: "Welcome, Administrator! 👋",
+      cards: [
+        ["👥", "Users", "Manage Shimbir accounts."],
+        ["🏫", "Schools", "Manage schools and classes."],
+        ["📊", "Reports", "View learning reports."],
+        ["⚙️", "Settings", "Configure Shimbir."],
+      ],
+    },
   };
 
-  const roleIcons = {
-    teacher: "📚",
-    parent: "🏠",
-    admin: "⚙️",
-  };
+  const dashboard =
+    dashboardData[role];
 
   return (
     <main className="roleDashboard">
+
       <header className="topbar">
+
         <div className="brand">
-          <span className="brandBird">🐦</span>
-          <span className="brandName">SHIMBIR</span>
+
+          <span className="brandBird">
+            🐦
+          </span>
+
+          <span className="brandName">
+            SHIMBIR
+          </span>
+
         </div>
 
-        <button className="logoutButton" onClick={logout}>
+        <button
+          className="logoutButton"
+          onClick={logout}
+        >
           Log out
         </button>
+
       </header>
 
       <section className="dashboardContent">
+
         <div className="accountBadge">
-          {roleIcons[loggedInUser.role]}{" "}
-          {roleLabels[loggedInUser.role]} Account
+          {dashboard.icon} {dashboard.title}
         </div>
 
         <h1>
-          Welcome, {loggedInUser.name}! 👋
+          {dashboard.greeting}
         </h1>
 
         <p className="dashboardIntro">
-          You are signed in as a{" "}
-          <strong>{roleLabels[loggedInUser.role]}</strong>.
+          You are currently signed in as a{" "}
+          <strong>
+            {dashboard.title.replace(
+              " Dashboard",
+              ""
+            )}
+          </strong>
+          .
         </p>
 
-        {loggedInUser.role === "teacher" && (
-          <div className="dashboardGrid">
-            <div className="dashboardCard">
-              <span>👩‍🎓</span>
-              <h2>My Students</h2>
-              <p>View student progress and mastery.</p>
-              <button>VIEW STUDENTS</button>
-            </div>
+        <div className="dashboardGrid">
 
-            <div className="dashboardCard">
-              <span>📝</span>
-              <h2>Assignments</h2>
-              <p>Create and manage math assignments.</p>
-              <button>ASSIGN WORK</button>
-            </div>
+          {dashboard.cards.map(
+            ([icon, title, description]) => (
 
-            <div className="dashboardCard">
-              <span>🎬</span>
-              <h2>Lessons</h2>
-              <p>Upload and organize video lessons.</p>
-              <button>MANAGE LESSONS</button>
-            </div>
+              <div
+                className="dashboardCard"
+                key={title}
+              >
 
-            <div className="dashboardCard">
-              <span>📊</span>
-              <h2>Progress</h2>
-              <p>See learning patterns across your class.</p>
-              <button>VIEW PROGRESS</button>
-            </div>
-          </div>
-        )}
+                <span>
+                  {icon}
+                </span>
 
-        {loggedInUser.role === "parent" && (
-          <div className="dashboardGrid">
-            <div className="dashboardCard">
-              <span>👧</span>
-              <h2>Salma</h2>
-              <p>View your child's learning journey.</p>
-              <button>VIEW JOURNEY</button>
-            </div>
+                <h2>
+                  {title}
+                </h2>
 
-            <div className="dashboardCard">
-              <span>📊</span>
-              <h2>Progress</h2>
-              <p>See math mastery and recent activity.</p>
-              <button>VIEW PROGRESS</button>
-            </div>
+                <p>
+                  {description}
+                </p>
 
-            <div className="dashboardCard">
-              <span>⭐</span>
-              <h2>Achievements</h2>
-              <p>See stars, rewards, and milestones.</p>
-              <button>VIEW ACHIEVEMENTS</button>
-            </div>
-          </div>
-        )}
+                <button>
+                  OPEN
+                </button>
 
-        {loggedInUser.role === "admin" && (
-          <div className="dashboardGrid">
-            <div className="dashboardCard">
-              <span>👥</span>
-              <h2>Users</h2>
-              <p>Manage students, teachers, and parents.</p>
-              <button>MANAGE USERS</button>
-            </div>
+              </div>
 
-            <div className="dashboardCard">
-              <span>🏫</span>
-              <h2>School</h2>
-              <p>Manage classes and school information.</p>
-              <button>MANAGE SCHOOL</button>
-            </div>
+            )
+          )}
 
-            <div className="dashboardCard">
-              <span>📊</span>
-              <h2>Reports</h2>
-              <p>Review school-wide learning data.</p>
-              <button>VIEW REPORTS</button>
-            </div>
+        </div>
 
-            <div className="dashboardCard">
-              <span>⚙️</span>
-              <h2>Settings</h2>
-              <p>Configure Shimbir administration.</p>
-              <button>SETTINGS</button>
-            </div>
-          </div>
-        )}
       </section>
+
     </main>
   );
 }
