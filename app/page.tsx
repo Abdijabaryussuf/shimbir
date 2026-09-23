@@ -3,39 +3,43 @@
 
 import { useState } from "react";
 
-type Role = "student" | "teacher" | "parent" | "admin";
-
 export default function Home() {
+  const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [role, setRole] = useState<Role>("student");
   const [error, setError] = useState("");
   const [showQR, setShowQR] = useState(false);
 
-  function login() {
+  function handleLogin() {
     if (
       username.trim().toLowerCase() === "shimbir" &&
       password === "shimbir123"
     ) {
       setError("");
       setLoggedIn(true);
-      setRole("student");
     } else {
-      setError("Please check your username and password.");
+      setError("Incorrect username or password.");
     }
   }
 
-  function logout() {
+  function handleLogout() {
     setLoggedIn(false);
     setUsername("");
     setPassword("");
     setError("");
+    setShowQR(false);
   }
+
+  /*
+   * =====================================================
+   * LOGIN SCREEN
+   * =====================================================
+   */
 
   if (!loggedIn) {
     return (
       <main className="loginScreen">
+
         <div className="loginContainer">
 
           <h1>Shimbir Learning Labs</h1>
@@ -54,7 +58,7 @@ export default function Home() {
             type="text"
             placeholder="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(event) => setUsername(event.target.value)}
             autoComplete="username"
           />
 
@@ -62,10 +66,10 @@ export default function Home() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                login();
+            onChange={(event) => setPassword(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                handleLogin();
               }
             }}
             autoComplete="current-password"
@@ -73,43 +77,41 @@ export default function Home() {
 
           <button
             className="loginMainButton"
-            onClick={login}
+            onClick={handleLogin}
           >
-            Let's Fly! 🚀
+            Let's Go! 🚀
           </button>
 
           {error && (
             <div className="loginError">
-              {error}
+              ⚠️ {error}
             </div>
           )}
 
-          <div className="loginDivider" />
-
-          <div className="loginActions">
-
-            <button
-              className="qrButton"
-              onClick={() => setShowQR(true)}
-            >
-              📷 Scan QR Code
-            </button>
-
+          <div className="loginDivider">
+            <span>or</span>
           </div>
 
+          <button
+            className="qrButton"
+            onClick={() => setShowQR(true)}
+          >
+            📷 Scan QR Code
+          </button>
+
           {showQR && (
-            <div className="qrArea">
+            <div className="qrScanArea">
 
               <div className="qrPlaceholder">
-                <div className="qrIcon">📷</div>
-
-                <h3>Scan your Shimbir QR code</h3>
-
-                <p>
-                  QR sign-in will connect directly to your
-                  Shimbir account.
-                </p>
+                📷
               </div>
+
+              <h3>Scan Shimbir QR Code</h3>
+
+              <p>
+                QR sign-in will be connected to Shimbir
+                accounts.
+              </p>
 
               <button
                 className="cancelQR"
@@ -126,15 +128,28 @@ export default function Home() {
           </div>
 
           <div className="demoLogin">
-            <strong>Demo Account</strong>
-            <div>Username: <b>shimbir</b></div>
-            <div>Password: <b>shimbir123</b></div>
+            <strong>Demo Login</strong>
+
+            <p>
+              Username: <b>shimbir</b>
+            </p>
+
+            <p>
+              Password: <b>shimbir123</b>
+            </p>
           </div>
 
         </div>
+
       </main>
     );
   }
+
+  /*
+   * =====================================================
+   * STUDENT DASHBOARD
+   * =====================================================
+   */
 
   return (
     <main className="studentScreen">
@@ -142,12 +157,13 @@ export default function Home() {
       <header className="appHeader">
 
         <div className="appBrand">
-          🐦 <strong>SHIMBIR</strong>
+          <span>🐦</span>
+          <strong>SHIMBIR</strong>
         </div>
 
         <button
           className="logoutButton"
-          onClick={logout}
+          onClick={handleLogout}
         >
           Log out
         </button>
@@ -160,17 +176,29 @@ export default function Home() {
           🎒 Student
         </div>
 
-        <h1>
-          Hi, Salma! 👋
-        </h1>
+        <div className="welcomeSection">
 
-        <p className="studentIntro">
-          Ready to learn, master, and fly higher?
-        </p>
+          <div>
+            <h1>
+              Hi, Salma! 👋
+            </h1>
+
+            <p>
+              Ready to learn, master, and fly higher?
+            </p>
+          </div>
+
+          <div className="welcomeBird">
+            🦅
+          </div>
+
+        </div>
 
         <section className="journeyCard">
 
-          <h2>Your Shimbir Journey</h2>
+          <h2>
+            Your Shimbir Journey
+          </h2>
 
           <img
             src="/birds.svg"
@@ -179,11 +207,27 @@ export default function Home() {
           />
 
           <div className="journeyLabels">
-            <span>🐦 Kestrel</span>
-            <span>🦅 Hawk</span>
-            <span>🦅 Eagle</span>
-            <span>🦅 Gyrfalcon</span>
-            <span>⚡ Peregrine</span>
+
+            <span>
+              🐦 Kestrel
+            </span>
+
+            <span>
+              🦅 Hawk
+            </span>
+
+            <span>
+              🦅 Eagle
+            </span>
+
+            <span>
+              🦅 Gyrfalcon
+            </span>
+
+            <span>
+              ⚡ Peregrine
+            </span>
+
           </div>
 
         </section>
@@ -195,31 +239,64 @@ export default function Home() {
         <div className="gameGrid">
 
           <div className="gameCard">
-            <div className="gameIcon">🚂</div>
-            <h3>Train Builder</h3>
+
+            <div className="gameIcon">
+              🚂
+            </div>
+
+            <h3>
+              Train Builder
+            </h3>
+
             <p>
               Build trains and practice counting,
               addition, and subtraction.
             </p>
-            <button>PLAY 🚂</button>
+
+            <button>
+              PLAY 🚂
+            </button>
+
           </div>
 
           <div className="gameCard">
-            <div className="gameIcon">🔟</div>
-            <h3>Build the Number</h3>
+
+            <div className="gameIcon">
+              🔟
+            </div>
+
+            <h3>
+              Build the Number
+            </h3>
+
             <p>
               Use tens and ones to build numbers.
             </p>
-            <button>PLAY 🔟</button>
+
+            <button>
+              PLAY 🔟
+            </button>
+
           </div>
 
           <div className="gameCard">
-            <div className="gameIcon">🐦</div>
-            <h3>Bird Count</h3>
+
+            <div className="gameIcon">
+              🐦
+            </div>
+
+            <h3>
+              Bird Count
+            </h3>
+
             <p>
               Count the birds and find the answer.
             </p>
-            <button>PLAY 🐦</button>
+
+            <button>
+              PLAY 🐦
+            </button>
+
           </div>
 
         </div>
