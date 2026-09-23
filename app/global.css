@@ -1,1 +1,515 @@
+* {
+  box-sizing: border-box;
+}
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f8ff;
+  color: #17233c;
+}
+
+button {
+  font-family: inherit;
+}
+
+button:focus-visible {
+  outline: 4px solid #ffd54f;
+  outline-offset: 3px;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.topbar {
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: white;
+  border-bottom: 1px solid #e4eaf4;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandBird {
+  font-size: 38px;
+}
+
+.brandName {
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.topStars {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.main {
+  width: min(1180px, 94%);
+  margin: 0 auto;
+  padding: 34px 0 60px;
+}
+
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.welcome h1 {
+  margin: 0 0 7px;
+  font-size: clamp(30px, 5vw, 48px);
+}
+
+.welcome p {
+  margin: 0;
+  font-size: 19px;
+  color: #64728a;
+}
+
+.flightPath {
+  background: white;
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 8px 28px rgba(40, 64, 100, 0.08);
+  margin-bottom: 30px;
+}
+
+.flightTitle {
+  font-weight: 900;
+  font-size: 18px;
+  margin-bottom: 18px;
+}
+
+.birds {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.birdLevel {
+  text-align: center;
+  min-width: 80px;
+}
+
+.birdEmoji {
+  font-size: 39px;
+  display: block;
+}
+
+.birdLabel {
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.line {
+  height: 5px;
+  flex: 1;
+  background: #dbe5f5;
+  border-radius: 10px;
+}
+
+.line.done {
+  background: #5b8def;
+}
+
+.sectionTitle {
+  font-size: 29px;
+  font-weight: 900;
+  margin: 0 0 18px;
+}
+
+.games {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.gameCard {
+  background: white;
+  border-radius: 24px;
+  padding: 25px;
+  box-shadow: 0 8px 28px rgba(40, 64, 100, 0.08);
+  border: 2px solid transparent;
+}
+
+.gameIcon {
+  font-size: 54px;
+}
+
+.gameCard h3 {
+  font-size: 23px;
+  margin: 12px 0 7px;
+}
+
+.gameCard p {
+  color: #68758b;
+  line-height: 1.5;
+  min-height: 48px;
+}
+
+.playButton {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  background: #17233c;
+  color: white;
+}
+
+.playButton:hover {
+  transform: translateY(-1px);
+}
+
+.gameArea {
+  margin-top: 28px;
+  background: white;
+  border-radius: 28px;
+  padding: clamp(22px, 4vw, 42px);
+  box-shadow: 0 10px 35px rgba(40, 64, 100, 0.1);
+}
+
+.gameHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.gameHeader h2 {
+  margin: 0;
+  font-size: 31px;
+}
+
+.closeButton {
+  border: 0;
+  background: #eef2f8;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.question {
+  text-align: center;
+  font-size: 25px;
+  font-weight: 900;
+  margin: 20px auto 28px;
+  max-width: 700px;
+}
+
+.train {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-height: 120px;
+  padding: 20px;
+  background: #eef7ff;
+  border-radius: 22px;
+  margin-bottom: 25px;
+}
+
+.trainEngine {
+  font-size: 48px;
+}
+
+.trainCar {
+  width: 58px;
+  height: 48px;
+  border-radius: 9px;
+  border: 4px solid #263754;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.redCar {
+  background: #ff7777;
+}
+
+.blueCar {
+  background: #6da7ff;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.controlButton {
+  min-width: 110px;
+  border: 0;
+  border-radius: 16px;
+  padding: 16px 20px;
+  font-size: 19px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.redControl {
+  background: #ff7777;
+}
+
+.blueControl {
+  background: #6da7ff;
+}
+
+.answerBox {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+.numberButton {
+  width: 60px;
+  height: 60px;
+  border: 3px solid #d9e2f0;
+  background: white;
+  border-radius: 15px;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.checkButton {
+  display: block;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 15px;
+  background: #17233c;
+  color: white;
+  padding: 16px 28px;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.feedback {
+  text-align: center;
+  font-size: 21px;
+  font-weight: 900;
+  margin-top: 20px;
+}
+
+.baseTen {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 14px;
+  min-height: 190px;
+  background: #fff8e8;
+  border-radius: 22px;
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+.tensGroup,
+.onesGroup {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  max-width: 400px;
+}
+
+.tenBlock {
+  width: 28px;
+  height: 110px;
+  border: 3px solid #395477;
+  background: #8eb6e8;
+  border-radius: 4px;
+}
+
+.oneBlock {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #395477;
+  background: #b9d2ee;
+  border-radius: 4px;
+}
+
+.blockCount {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.birdGame {
+  text-align: center;
+  background: #edf8ff;
+  border-radius: 24px;
+  padding: 35px;
+}
+
+.flyingBirds {
+  font-size: 65px;
+  min-height: 100px;
+  letter-spacing: 7px;
+  margin: 15px;
+}
+
+.choiceGrid {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.choice {
+  width: 75px;
+  height: 65px;
+  background: white;
+  border: 3px solid #d6e0ee;
+  border-radius: 15px;
+  font-size: 23px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.celebrationContent {
+  position: relative;
+  z-index: 3;
+}
+
+.bigStars {
+  font-size: 65px;
+  animation: pulse 0.8s infinite alternate;
+}
+
+.celebration h2 {
+  font-size: clamp(38px, 8vw, 70px);
+  margin: 15px 0;
+}
+
+.celebration p {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.star {
+  position: absolute;
+  font-size: 42px;
+  animation: fly 2.4s linear infinite;
+}
+
+.star:nth-child(1) {
+  left: 8%;
+  top: 15%;
+}
+
+.star:nth-child(2) {
+  left: 25%;
+  top: 70%;
+  animation-delay: 0.3s;
+}
+
+.star:nth-child(3) {
+  right: 15%;
+  top: 20%;
+  animation-delay: 0.6s;
+}
+
+.star:nth-child(4) {
+  right: 30%;
+  bottom: 12%;
+  animation-delay: 0.9s;
+}
+
+.star:nth-child(5) {
+  left: 50%;
+  top: 8%;
+  animation-delay: 1.2s;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes fly {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-80px) rotate(180deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(360deg);
+  }
+}
+
+@media (max-width: 800px) {
+  .games {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .birds {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .line {
+    min-width: 35px;
+  }
+
+  .topbar {
+    padding: 0 16px;
+  }
+}
