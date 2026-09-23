@@ -1,3 +1,4 @@
+```tsx
 "use client";
 
 import { useState } from "react";
@@ -5,20 +6,38 @@ import { useState } from "react";
 type Game = "train" | "blocks" | "birds" | null;
 
 export default function Home() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
   const [game, setGame] = useState<Game>(null);
   const [stars, setStars] = useState(12);
   const [celebration, setCelebration] = useState(false);
 
-  // TRAIN BUILDER
   const [redCars, setRedCars] = useState(2);
   const [blueCars, setBlueCars] = useState(3);
 
-  // BUILD THE NUMBER
   const [tens, setTens] = useState(2);
   const [ones, setOnes] = useState(4);
 
-  // BIRD COUNT
   const [birdAnswer, setBirdAnswer] = useState<number | null>(null);
+
+  function handleLogin() {
+    if (username.toLowerCase() === "salma" && password === "shimbir") {
+      setLoggedIn(true);
+      setLoginError("");
+    } else {
+      setLoginError("Please check your username and password.");
+    }
+  }
+
+  function logout() {
+    setLoggedIn(false);
+    setUsername("");
+    setPassword("");
+    setGame(null);
+  }
 
   function celebrate() {
     setStars((s) => s + 5);
@@ -56,38 +75,140 @@ export default function Home() {
     setBirdAnswer(null);
   }
 
+  /* ---------------- LOGIN ---------------- */
+
+  if (!loggedIn) {
+    return (
+      <main className="loginPage">
+
+        <div className="loginCard">
+
+          <div className="loginLogo">
+            🐦
+          </div>
+
+          <h1>SHIMBIR</h1>
+
+          <p className="loginTagline">
+            Learn. Master. Fly higher.
+          </p>
+
+          <div className="loginRole">
+            STUDENT LOGIN
+          </div>
+
+          <label>Username</label>
+
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
+            autoComplete="username"
+          />
+
+          <label>Password</label>
+
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            autoComplete="current-password"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleLogin();
+              }
+            }}
+          />
+
+          {loginError && (
+            <div className="loginError">
+              {loginError}
+            </div>
+          )}
+
+          <button
+            className="loginButton"
+            onClick={handleLogin}
+          >
+            LOG IN 🚀
+          </button>
+
+          <button className="qrButton">
+            ▣ Sign in with QR code
+          </button>
+
+          <div className="loginFooter">
+            <button
+              onClick={() =>
+                alert("Teacher login will be added next.")
+              }
+            >
+              Teacher Login
+            </button>
+          </div>
+
+          <div className="demoHint">
+            Demo student: <strong>salma</strong> /{" "}
+            <strong>shimbir</strong>
+          </div>
+
+        </div>
+
+      </main>
+    );
+  }
+
+  /* ---------------- LOGGED-IN APP ---------------- */
+
   return (
     <main className="app">
 
-      {/* TOP BAR */}
       <header className="topbar">
+
         <div className="brand">
           <span className="brandBird">🐦</span>
           <span className="brandName">SHIMBIR</span>
         </div>
 
-        <div className="topStars">
-          ⭐ {stars}
+        <div className="studentTop">
+
+          <div className="topStars">
+            ⭐ {stars}
+          </div>
+
+          <button
+            className="logoutButton"
+            onClick={logout}
+          >
+            Log out
+          </button>
+
         </div>
+
       </header>
 
       {!game && (
         <section className="main">
 
-          {/* WELCOME */}
           <div className="welcome">
+
             <div>
               <h1>Hi, Salma! 👋</h1>
-              <p>Ready to learn, play, and fly higher?</p>
+              <p>
+                Ready to learn, play, and fly higher?
+              </p>
             </div>
 
             <div className="welcomeBird">
               🦅
             </div>
+
           </div>
 
-          {/* JOURNEY */}
           <section className="journey">
+
             <h2>Your Flight Journey</h2>
 
             <div className="flightPath">
@@ -131,16 +252,22 @@ export default function Home() {
               </div>
 
             </div>
+
           </section>
 
-          {/* GAMES */}
           <section>
-            <h2 className="sectionTitle">🎮 Math Playground</h2>
+
+            <h2 className="sectionTitle">
+              🎮 Math Playground
+            </h2>
 
             <div className="games">
 
               <div className="gameCard">
-                <div className="gameIcon">🚂</div>
+
+                <div className="gameIcon">
+                  🚂
+                </div>
 
                 <div>
                   <h3>Train Builder</h3>
@@ -150,10 +277,14 @@ export default function Home() {
                 <button onClick={() => setGame("train")}>
                   PLAY →
                 </button>
+
               </div>
 
               <div className="gameCard">
-                <div className="gameIcon">🔟</div>
+
+                <div className="gameIcon">
+                  🔟
+                </div>
 
                 <div>
                   <h3>Build the Number</h3>
@@ -163,10 +294,14 @@ export default function Home() {
                 <button onClick={() => setGame("blocks")}>
                   PLAY →
                 </button>
+
               </div>
 
               <div className="gameCard">
-                <div className="gameIcon">🐦</div>
+
+                <div className="gameIcon">
+                  🐦
+                </div>
 
                 <div>
                   <h3>Bird Count</h3>
@@ -176,30 +311,46 @@ export default function Home() {
                 <button onClick={() => setGame("birds")}>
                   PLAY →
                 </button>
+
               </div>
 
             </div>
+
           </section>
 
         </section>
       )}
 
       {/* TRAIN GAME */}
+
       {game === "train" && (
         <section className="gameArea">
 
           <div className="gameHeader">
-            <button className="closeButton" onClick={resetGame}>
+
+            <button
+              className="closeButton"
+              onClick={resetGame}
+            >
               ← Back
             </button>
 
             <div>⭐ {stars}</div>
+
           </div>
 
           <div className="question">
+
             <span>🚂</span>
-            <h1>The train has 5 cars.</h1>
-            <p>Add 3 more cars!</p>
+
+            <h1>
+              The train has 5 cars.
+            </h1>
+
+            <p>
+              Add 3 more cars!
+            </p>
+
           </div>
 
           <div className="train">
@@ -211,31 +362,40 @@ export default function Home() {
             {Array.from({
               length: redCars + blueCars,
             }).map((_, i) => (
+
               <div
                 key={i}
                 className={`trainCar ${
-                  i < redCars ? "redCar" : "blueCar"
+                  i < redCars
+                    ? "redCar"
+                    : "blueCar"
                 }`}
               >
                 {i < redCars ? "🔴" : "🔵"}
               </div>
+
             ))}
 
           </div>
 
           <div className="answerBox">
-            <strong>Total cars: {redCars + blueCars}</strong>
+            <strong>
+              Total cars: {redCars + blueCars}
+            </strong>
           </div>
 
           <div className="controls">
 
             <div>
+
               <h3>Red cars</h3>
 
               <button
                 className="controlButton redControl"
                 onClick={() =>
-                  setRedCars((n) => Math.max(0, n - 1))
+                  setRedCars(
+                    (n) => Math.max(0, n - 1)
+                  )
                 }
               >
                 −
@@ -245,19 +405,25 @@ export default function Home() {
 
               <button
                 className="controlButton redControl"
-                onClick={() => setRedCars((n) => n + 1)}
+                onClick={() =>
+                  setRedCars((n) => n + 1)
+                }
               >
                 +
               </button>
+
             </div>
 
             <div>
+
               <h3>Blue cars</h3>
 
               <button
                 className="controlButton blueControl"
                 onClick={() =>
-                  setBlueCars((n) => Math.max(0, n - 1))
+                  setBlueCars(
+                    (n) => Math.max(0, n - 1)
+                  )
                 }
               >
                 −
@@ -267,78 +433,122 @@ export default function Home() {
 
               <button
                 className="controlButton blueControl"
-                onClick={() => setBlueCars((n) => n + 1)}
+                onClick={() =>
+                  setBlueCars((n) => n + 1)
+                }
               >
                 +
               </button>
+
             </div>
 
           </div>
 
-          <button className="checkButton" onClick={checkTrain}>
+          <button
+            className="checkButton"
+            onClick={checkTrain}
+          >
             CHECK MY TRAIN 🚂
           </button>
 
         </section>
       )}
 
-      {/* BUILD THE NUMBER */}
+      {/* BUILD NUMBER GAME */}
+
       {game === "blocks" && (
         <section className="gameArea">
 
           <div className="gameHeader">
-            <button className="closeButton" onClick={resetGame}>
+
+            <button
+              className="closeButton"
+              onClick={resetGame}
+            >
               ← Back
             </button>
 
             <div>⭐ {stars}</div>
+
           </div>
 
           <div className="question">
+
             <span>🔟</span>
-            <h1>Build the number 24</h1>
-            <p>Use tens and ones.</p>
+
+            <h1>
+              Build the number 24
+            </h1>
+
+            <p>
+              Use tens and ones.
+            </p>
+
           </div>
 
           <div className="baseTen">
 
             <div className="tensGroup">
+
               <h3>Tens</h3>
 
-              {Array.from({ length: tens }).map((_, i) => (
-                <div className="tenBlock" key={i}>
+              {Array.from({
+                length: tens,
+              }).map((_, i) => (
+
+                <div
+                  className="tenBlock"
+                  key={i}
+                >
                   10
                 </div>
+
               ))}
+
             </div>
 
             <div className="onesGroup">
+
               <h3>Ones</h3>
 
-              {Array.from({ length: ones }).map((_, i) => (
-                <div className="oneBlock" key={i}>
+              {Array.from({
+                length: ones,
+              }).map((_, i) => (
+
+                <div
+                  className="oneBlock"
+                  key={i}
+                >
                   1
                 </div>
+
               ))}
+
             </div>
 
           </div>
 
           <div className="answerBox">
+
             <strong>
-              {tens} tens + {ones} ones = {tens * 10 + ones}
+              {tens} tens + {ones} ones ={" "}
+              {tens * 10 + ones}
             </strong>
+
           </div>
 
           <div className="controls">
 
             <div>
+
               <h3>Tens</h3>
 
               <button
                 className="controlButton"
                 onClick={() =>
-                  setTens((n) => Math.max(0, n - 1))
+                  setTens(
+                    (n) => Math.max(0, n - 1)
+                  )
                 }
               >
                 −
@@ -348,19 +558,25 @@ export default function Home() {
 
               <button
                 className="controlButton"
-                onClick={() => setTens((n) => n + 1)}
+                onClick={() =>
+                  setTens((n) => n + 1)
+                }
               >
                 +
               </button>
+
             </div>
 
             <div>
+
               <h3>Ones</h3>
 
               <button
                 className="controlButton"
                 onClick={() =>
-                  setOnes((n) => Math.max(0, n - 1))
+                  setOnes(
+                    (n) => Math.max(0, n - 1)
+                  )
                 }
               >
                 −
@@ -370,57 +586,93 @@ export default function Home() {
 
               <button
                 className="controlButton"
-                onClick={() => setOnes((n) => n + 1)}
+                onClick={() =>
+                  setOnes((n) => n + 1)
+                }
               >
                 +
               </button>
+
             </div>
 
           </div>
 
-          <button className="checkButton" onClick={checkNumber}>
+          <button
+            className="checkButton"
+            onClick={checkNumber}
+          >
             CHECK MY NUMBER 🔢
           </button>
 
         </section>
       )}
 
-      {/* BIRD COUNT */}
+      {/* BIRD COUNT GAME */}
+
       {game === "birds" && (
         <section className="gameArea birdGame">
 
           <div className="gameHeader">
-            <button className="closeButton" onClick={resetGame}>
+
+            <button
+              className="closeButton"
+              onClick={resetGame}
+            >
               ← Back
             </button>
 
             <div>⭐ {stars}</div>
+
           </div>
 
           <div className="question">
+
             <span>🐦</span>
-            <h1>How many birds?</h1>
-            <p>Count carefully!</p>
+
+            <h1>
+              How many birds?
+            </h1>
+
+            <p>
+              Count carefully!
+            </p>
+
           </div>
 
           <div className="flyingBirds">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <span key={i}>🐦</span>
+
+            {Array.from({
+              length: 6,
+            }).map((_, i) => (
+
+              <span key={i}>
+                🐦
+              </span>
+
             ))}
+
           </div>
 
           <div className="choiceGrid">
+
             {[4, 5, 6, 7].map((number) => (
+
               <button
                 key={number}
                 className={`choice ${
-                  birdAnswer === number ? "selected" : ""
+                  birdAnswer === number
+                    ? "selected"
+                    : ""
                 }`}
-                onClick={() => setBirdAnswer(number)}
+                onClick={() =>
+                  setBirdAnswer(number)
+                }
               >
                 {number}
               </button>
+
             ))}
+
           </div>
 
           <button
@@ -434,6 +686,7 @@ export default function Home() {
       )}
 
       {/* CELEBRATION */}
+
       {celebration && (
         <div className="celebration">
 
@@ -443,9 +696,13 @@ export default function Home() {
               ⭐ ⭐ ⭐
             </div>
 
-            <h1>AMAZING! 🎉</h1>
+            <h1>
+              AMAZING! 🎉
+            </h1>
 
-            <p>You mastered it!</p>
+            <p>
+              You mastered it!
+            </p>
 
             <div className="reward">
               +5 ⭐
@@ -456,3 +713,11 @@ export default function Home() {
             </div>
 
           </div>
+
+        </div>
+      )}
+
+    </main>
+  );
+}
+```
