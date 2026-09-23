@@ -1,1 +1,25 @@
+```json
+{
+  "name": "Shimbir",
+  "short_name": "Shimbir",
+  "description": "K–2 Mathematics Learning Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef7ff",
+  "theme_color": "#1a237e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+```
 
