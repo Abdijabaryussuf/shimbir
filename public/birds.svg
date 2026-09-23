@@ -1,1 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 220">
+  <rect width="900" height="220" rx="30" fill="#eef7ff"/>
 
+  <text x="80" y="135" font-size="80">🐦</text>
+  <text x="255" y="135" font-size="80">🦅</text>
+  <text x="430" y="135" font-size="80">🦅</text>
+  <text x="605" y="135" font-size="80">🦅</text>
+  <text x="780" y="135" font-size="70">⚡</text>
+
+  <line x1="165" y1="110" x2="240" y2="110"
+        stroke="#8da9d2" stroke-width="8"/>
+
+  <line x1="340" y1="110" x2="415" y2="110"
+        stroke="#8da9d2" stroke-width="8"/>
+
+  <line x1="515" y1="110" x2="590" y2="110"
+        stroke="#8da9d2" stroke-width="8"/>
+
+  <line x1="690" y1="110" x2="760" y2="110"
+        stroke="#8da9d2" stroke-width="8"/>
+</svg>
