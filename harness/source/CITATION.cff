@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it."
+title: "Jamii Harness"
+version: 0.1.0
+license: MIT
+abstract: "Open, model-agnostic harness for teacher-in-the-loop AI formative assessment. Synthetic data only."
+authors:
+  - name: "Jamii Digital"
+keywords: [formative assessment, K-12, open source, teacher in the loop, AI harness]

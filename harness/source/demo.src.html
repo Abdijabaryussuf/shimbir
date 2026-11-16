@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jamii Harness: a teacher-in-the-loop AI harness</title>
+<meta name="description" content="Open, model-agnostic harness that helps a teacher and an AI tutor coordinate formative assessment. Synthetic data only. MIT code, CC-BY data.">
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#1d2433;--mut:#4a5568;--line:#e6dcc3;--navy:#143a63;--gold:#f4c542;--gold2:#8a5d00;--grn:#1f7a3f;--red:#b3261e;--blu:#2b6cb0}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1722;--card:#17212f;--ink:#eef2f7;--mut:#b5c0cf;--line:#2c3a4e;--navy:#9cc4ee;--gold2:#f4c542;--grn:#6fd08c;--red:#ff8a80;--blu:#8fbbf0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--blu)}.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--gold);color:#000;padding:8px 12px;z-index:9}
+header{display:flex;gap:14px;align-items:center;padding:14px 16px;max-width:1100px;margin:auto}header svg{width:56px;height:56px;flex:none}
+h1{font-size:1.45rem;margin:0;color:var(--navy)}header p{margin:2px 0 0;color:var(--mut);font-size:.95rem}
+main{max-width:1100px;margin:auto;padding:0 16px 48px}
+.banner{background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:12px 16px;margin:8px 0 16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 16px}
+h2{font-size:1.2rem;margin:0 0 8px;color:var(--navy)}h3{font-size:1.02rem;margin:14px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:.93rem}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}th{color:var(--mut);font-weight:600}
+.scroll{overflow-x:auto}
+button,select,input,textarea{font:inherit;color:var(--ink)}
+button{background:var(--card);border:2px solid var(--navy);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+button.pri{background:var(--navy);color:#fff}@media (prefers-color-scheme:dark){button.pri{color:#0f1722}}
+button:hover{filter:brightness(1.07)}button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:1px 10px;font-size:.82rem;color:var(--mut);margin:0 4px 4px 0}
+.tag.warn{border-color:var(--red);color:var(--red)}.tag.ok{border-color:var(--grn);color:var(--grn)}
+.prop{border:2px solid var(--line);border-left:8px solid var(--gold);border-radius:12px;padding:12px 14px;margin:10px 0}
+.prop.approved{border-left-color:var(--grn)}.prop.rejected{border-left-color:var(--red);opacity:.8}
+.item{padding:8px 10px;margin:6px 0;border-radius:10px;background:rgba(244,197,66,.12)}
+.item small{color:var(--mut)}
+textarea{width:100%;min-height:150px;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:8px}
+label{display:block;margin:8px 0 2px;font-weight:600}input,select{border:2px solid var(--line);border-radius:8px;padding:8px;width:100%;background:var(--bg)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+details{margin:8px 0}summary{cursor:pointer;font-weight:600;padding:6px 0}
+pre{white-space:pre-wrap;font-size:.82rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;overflow:auto}
+.dim{color:var(--mut)}.drop{text-decoration:line-through;color:var(--mut)}
+footer{border-top:3px solid var(--gold);max-width:1100px;margin:auto;padding:0 16px 32px;color:var(--mut);font-size:.9rem}
+</style></head><body>
+<a class="skip" href="#main">Skip to the demo</a>
+<header>/*LOGO*/<div><h1>Jamii Harness</h1><p>An open, model-agnostic harness where a teacher stays in charge of an AI tutor. Part of <a href="index.html">Jamii Digital</a>.</p></div></header>
+<main id="main">
+<div class="banner" role="note"><b>Synthetic data only.</b> Six pretend students (S1 to S6) and no real names. Nothing leaves your browser unless you choose an outside model below. The harness <b>recommends</b>; you <b>decide</b>. This is a research prototype, not a product, and its numbers are a smoke test, not evidence of learning gains.</div>
+
+<section aria-labelledby="h-class"><h2 id="h-class">1. The classroom</h2>
+<p class="dim" id="skill"></p>
+<div class="scroll"><table id="roster"><caption class="dim" style="text-align:left">Pseudonymous students. Groups A, B and C are classroom groups.</caption><thead><tr><th>Student</th><th>Group</th><th>Mastery</th><th>Hints used</th><th>Mood</th><th>Common errors</th></tr></thead><tbody></tbody></table></div>
+<h3>What the teacher asked for</h3><p id="tin" class="dim"></p></section>
+
+<section aria-labelledby="h-task"><h2 id="h-task">2. Ask the harness for help</h2>
+<p>Pick a task. Each one builds a small, task-specific context, calls the model, checks the answer against a schema, and returns a <b>proposal</b> that waits for you.</p>
+<div class="row" role="group" aria-label="Tasks">
+<button class="pri" data-task="adaptPlan">Adapt the lesson plan</button>
+<button class="pri" data-task="differentiate">Differentiate for each student</button>
+<button class="pri" data-task="strategySupport">Support one student</button>
+<button class="pri" data-task="goalsTracking">Set and track goals</button></div>
+<div id="ss" hidden><label for="stu">Which student for "Support one student"?</label><select id="stu"></select></div>
+<details><summary>Model settings (optional)</summary>
+<p class="dim">Default is a built-in reference model that runs offline and needs no key. You can instead use any OpenAI-compatible endpoint, including open-weight models you host yourself (for example Ollama or vLLM). Your key stays in this page's memory and is never saved. Only pseudonymous ids and scrubbed text are sent.</p>
+<div class="grid"><div><label for="mk">Model</label><select id="mk"><option value="ref">Reference model (offline)</option><option value="oai">OpenAI-compatible endpoint</option></select></div>
+<div><label for="mu">Base URL</label><input id="mu" value="http://localhost:11434/v1" autocomplete="off"></div>
+<div><label for="mn">Model name</label><input id="mn" value="llama3" autocomplete="off"></div>
+<div><label for="mkey">API key (optional)</label><input id="mkey" type="password" autocomplete="off"></div></div>
+<p class="dim">If the endpoint fails or answers badly, the harness falls back to the reference model and says so.</p></details></section>
+
+<section aria-labelledby="h-prop"><h2 id="h-prop">3. Proposals waiting for you</h2>
+<div id="status" class="dim" role="status" aria-live="polite">Nothing yet. Choose a task above.</div>
+<div id="props"></div></section>
+
+<section aria-labelledby="h-audit"><h2 id="h-audit">4. Audit log</h2>
+<p class="dim">Every proposal and decision is recorded. Export it to share with a school, a researcher or an auditor.</p>
+<div class="row"><button id="exp">Download the trace (JSON)</button></div><pre id="audit" aria-live="polite">No events yet.</pre></section>
+
+<section aria-labelledby="h-gov"><h2 id="h-gov">How this harness is built</h2>
+<ul>
+<li><b>Open:</b> MIT code, CC-BY-4.0 data, zero dependencies. Public goods (misconception sets, skills) are loaded through a registry that only accepts open licenses.</li>
+<li><b>Model-agnostic:</b> swap the reference model for any OpenAI-compatible model, including open-weight models.</li>
+<li><b>Context you can see:</b> each proposal shows exactly what was put in the model's context, what was dropped for budget, and why.</li>
+<li><b>Grounded in learning science:</b> misconceptions, productive struggle, zone of proximal development, cognitive load and teacher agency.</li>
+<li><b>Human in the loop:</b> nothing is applied until a teacher approves, edits or rejects it.</li>
+<li><b>Privacy by design:</b> pseudonymous ids only, names are rejected, emails and phone numbers are masked, and nothing is stored on a server.</li>
+<li><b>Fairness check:</b> a plain table of support levels by group, so a teacher can notice patterns.</li></ul></section>
+</main>
+<footer style="text-align:center"><p style="margin:0 0 12px"><b style="color:var(--navy);font-size:1.15rem">Jamii Digital</b><br>Building digitally robust &amp; resilient communities</p>Jamii Harness v<span id="ver"></span>. Code: MIT. Sample data: CC-BY-4.0. Honest limits: the reference model is rule-based, results are not yet validated in real classrooms, and outside models are untested here.</footer>
+<script>
+/*HARNESS*/
+const ROOM=/*ROOM*/;const MIS=/*MIS*/;
+const $=id=>document.getElementById(id);const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('ver').textContent=VERSION;$('skill').textContent='Skill: '+ROOM.skill;
+$('tin').textContent=Object.entries(ROOM.teacherInput).map(([k,v])=>k+': '+v).join(' · ');
+$('roster').tBodies[0].innerHTML=ROOM.students.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.group)}</td><td>${s.mastery}</td><td>${s.hintsUsed}</td><td>${esc(s.mood)}</td><td>${esc([...new Set(s.errors)].join(', ')||'none')}</td></tr>`).join('');
+$('stu').innerHTML=ROOM.students.map(s=>`<option>${s.id}</option>`).join('');
+const goods=new PublicGoods();goods.register({id:MIS.id,type:'misconception-set',license:MIS.license||'CC-BY-4.0',version:MIS.version,items:MIS.items});
+let H;function build(){let model=new ReferenceModel();if($('mk').value==='oai')model=new OpenAICompatModel({baseUrl:$('mu').value,apiKey:$('mkey').value,model:$('mn').value});H=createHarness({model,goods})}
+build();['mk','mu','mn','mkey'].forEach(i=>$(i).addEventListener('change',build));
+const T={adaptPlan:'Adapt the lesson plan',differentiate:'Differentiate for each student',strategySupport:'Support one student',goalsTracking:'Set and track goals'};
+function body(p){const o=p.output;
+if(o.items)return o.items.length?o.items.map(i=>`<div class="item"><b>${esc(i.type)}</b> for ${esc(i.target)}: ${esc(i.action)}<br><small>Why: ${esc(i.rationale)} (${esc(i.concept)})</small></div>`).join(''):'<p>No changes suggested.</p>';
+if(o.plans)return `<div class="scroll"><table><thead><tr><th>Student</th><th>Next level</th><th>Support</th><th>Tutor should</th></tr></thead><tbody>${o.plans.map(x=>`<tr><td>${esc(x.student)}</td><td>${x.targetDifficulty}</td><td>${esc(x.scaffold)}</td><td>${esc(x.tutorInstruction)}${x.teacherNote?`<br><span class="tag ok">${esc(x.teacherNote)}</span>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+if(o.goals)return o.goals.map(g=>`<div class="item"><b>${esc(g.owner)}</b>: ${esc(g.metric)} ${g.baseline!==undefined?'from '+esc(g.baseline):''} ${g.target!==undefined?'to '+esc(g.target):''}<br><small>How: ${esc(g.how)}${g.review?' · review '+esc(g.review):''}</small></div>`).join('');
+return `<div class="item"><b>${esc(o.student)}</b>: ${esc(o.recommendation)}<br><small>Why: ${esc(o.why)}</small>${o.escalateToTeacher?'<br><span class="tag warn">Please check in with this student yourself</span>':''}</div>`}
+function card(p){const t=p.trace;
+const ctx=t.context.map(c=>`<tr><td class="${c.included?'':'drop'}">${esc(c.kind)}: ${esc(c.id)}</td><td>${c.tokens}</td><td>${c.included?'in':'dropped'}</td><td>${esc(c.why)}</td></tr>`).join('');
+const fr=p.fairness.rates.map(r=>`<tr><td>${esc(r.group)}</td><td>${r.n}</td><td>${r.workedExampleRate}</td><td>${r.reteachRate}</td></tr>`).join('');
+const ctl=p.status==='pending'?`<div class="row"><button class="pri" data-d="approve" data-id="${p.id}">Approve</button><button data-d="edit" data-id="${p.id}">Edit</button><button data-d="reject" data-id="${p.id}">Reject</button></div><div id="ed-${p.id}" hidden><label for="ta-${p.id}">Edit the proposal (JSON), then save</label><textarea id="ta-${p.id}">${esc(JSON.stringify(p.output,null,2))}</textarea><div class="row"><button class="pri" data-d="save" data-id="${p.id}">Save and approve</button></div></div>`:`<p><span class="tag ${p.status==='approved'?'ok':'warn'}">${p.status}</span> ${p.status==='approved'?'Only now could a school system apply this.':''}</p>`;
+return `<article class="prop ${p.status}" id="${p.id}"><h3 style="margin-top:0">${esc(T[p.task])} <span class="tag">${p.id}</span></h3>
+${t.fellBack?`<p><span class="tag warn">The chosen model failed (${esc(t.error)}). The reference model answered instead.</span></p>`:''}
+${p.flags.map(f=>`<p><span class="tag warn">${esc(f)}</span></p>`).join('')}${body(p)}${ctl}
+<details><summary>Context trace: what the model was shown</summary><p class="dim">Model: ${esc(t.model)} · ${t.tokens} tokens · ${t.latencyMs} ms · schema ${t.schemaOk?'ok':'failed'}</p><div class="scroll"><table><thead><tr><th>Item</th><th>Tokens</th><th></th><th>Why</th></tr></thead><tbody>${ctx}</tbody></table></div></details>
+<details><summary>Fairness table</summary><div class="scroll"><table><thead><tr><th>Group</th><th>Students</th><th>Worked-example rate</th><th>Re-teach rate</th></tr></thead><tbody>${fr}</tbody></table></div>${p.fairness.flags.map(f=>`<p class="tag warn">${esc(f)}</p>`).join('')}<p class="dim">${esc(p.fairness.note)}</p></details></article>`}
+const props=[];function draw(){$('props').innerHTML=props.slice().reverse().map(id=>card(H.get(id))).join('');$('audit').textContent=H.audit().length?H.audit().map(a=>`#${a.t} ${a.event} ${a.id}${a.note?' — '+a.note:''}${a.fellBack?' (fell back)':''}`).join('\n'):'No events yet.'}
+document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.task){const k=b.dataset.task;$('ss').hidden=k!=='strategySupport';let inp={students:ROOM.students,tutorStats:ROOM.tutorStats,teacherInput:ROOM.teacherInput};
+if(k==='strategySupport'){const s=ROOM.students.find(x=>x.id===$('stu').value);inp={student:{id:s.id,group:s.group,signals:{mood:s.mood,hintsUsed:s.hintsUsed,attempts:s.attempts,minutes:s.minutes,repeatedError:Math.max(0,...Object.values(s.errors.reduce((c,x)=>(c[x]=(c[x]||0)+1,c),{})))}}}}
+$('status').textContent='Working…';try{const p=await H.run(k,inp);props.push(p.id);$('status').textContent='New proposal ready. It is waiting for your decision.';draw();$(p.id).scrollIntoView({block:'nearest'})}catch(err){$('status').textContent='Could not run: '+err.message}return}
+if(b.dataset.d){const id=b.dataset.id,d=b.dataset.d;
+if(d==='edit'){$('ed-'+id).hidden=false;$('ta-'+id).focus();return}
+try{if(d==='save')H.decide(id,'edit',{edit:JSON.parse($('ta-'+id).value),note:'edited by teacher'});else H.decide(id,d);$('status').textContent='Proposal '+id+' '+(d==='reject'?'rejected':'approved')+'.'}catch(err){$('status').textContent='Not saved: '+err.message}draw()}
+if(b.id==='exp'){try{if(window.claude&&claude.use){const d=await claude.use('downloads');if(d){await d.save({filename:'jamii-harness-trace.json',data:H.exportTrace()});return}}}catch(err){}const u=URL.createObjectURL(new Blob([H.exportTrace()],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='jamii-harness-trace.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}});
+</script></body></html>

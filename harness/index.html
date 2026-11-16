@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jamii Harness: a teacher-in-the-loop AI harness</title>
+<meta name="description" content="Open, model-agnostic harness that helps a teacher and an AI tutor coordinate formative assessment. Synthetic data only. MIT code, CC-BY data.">
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#1d2433;--mut:#4a5568;--line:#e6dcc3;--navy:#143a63;--gold:#f4c542;--gold2:#8a5d00;--grn:#1f7a3f;--red:#b3261e;--blu:#2b6cb0}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1722;--card:#17212f;--ink:#eef2f7;--mut:#b5c0cf;--line:#2c3a4e;--navy:#9cc4ee;--gold2:#f4c542;--grn:#6fd08c;--red:#ff8a80;--blu:#8fbbf0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--blu)}.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--gold);color:#000;padding:8px 12px;z-index:9}
+header{display:flex;gap:14px;align-items:center;padding:14px 16px;max-width:1100px;margin:auto}header svg{width:56px;height:56px;flex:none}
+h1{font-size:1.45rem;margin:0;color:var(--navy)}header p{margin:2px 0 0;color:var(--mut);font-size:.95rem}
+main{max-width:1100px;margin:auto;padding:0 16px 48px}
+.banner{background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:12px 16px;margin:8px 0 16px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 16px}
+h2{font-size:1.2rem;margin:0 0 8px;color:var(--navy)}h3{font-size:1.02rem;margin:14px 0 6px}
+table{border-collapse:collapse;width:100%;font-size:.93rem}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}th{color:var(--mut);font-weight:600}
+.scroll{overflow-x:auto}
+button,select,input,textarea{font:inherit;color:var(--ink)}
+button{background:var(--card);border:2px solid var(--navy);border-radius:10px;padding:9px 14px;cursor:pointer;min-height:44px}
+button.pri{background:var(--navy);color:#fff}@media (prefers-color-scheme:dark){button.pri{color:#0f1722}}
+button:hover{filter:brightness(1.07)}button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:1px 10px;font-size:.82rem;color:var(--mut);margin:0 4px 4px 0}
+.tag.warn{border-color:var(--red);color:var(--red)}.tag.ok{border-color:var(--grn);color:var(--grn)}
+.prop{border:2px solid var(--line);border-left:8px solid var(--gold);border-radius:12px;padding:12px 14px;margin:10px 0}
+.prop.approved{border-left-color:var(--grn)}.prop.rejected{border-left-color:var(--red);opacity:.8}
+.item{padding:8px 10px;margin:6px 0;border-radius:10px;background:rgba(244,197,66,.12)}
+.item small{color:var(--mut)}
+textarea{width:100%;min-height:150px;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:8px}
+label{display:block;margin:8px 0 2px;font-weight:600}input,select{border:2px solid var(--line);border-radius:8px;padding:8px;width:100%;background:var(--bg)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+details{margin:8px 0}summary{cursor:pointer;font-weight:600;padding:6px 0}
+pre{white-space:pre-wrap;font-size:.82rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;overflow:auto}
+.dim{color:var(--mut)}.drop{text-decoration:line-through;color:var(--mut)}
+footer{border-top:3px solid var(--gold);max-width:1100px;margin:auto;padding:0 16px 32px;color:var(--mut);font-size:.9rem}
+</style></head><body>
+<a class="skip" href="#main">Skip to the demo</a>
+<header><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Jamii Digital logo: a screen showing binary code, a keyboard, and a mouse joined by a cable" xmlns:c2pa="http://c2pa.org/manifest">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#143a63"/><stop offset="1" stop-color="#0a1f36"/></linearGradient></defs>
+<circle cx="60" cy="60" r="57" fill="url(#g)" stroke="#f4c542" stroke-width="3"/>
+<rect x="24" y="14" width="72" height="46" rx="5" fill="#06121f" stroke="#cfd8e3" stroke-width="3"/>
+<rect x="53" y="60" width="14" height="7" fill="#cfd8e3"/><rect x="44" y="66" width="32" height="4" rx="2" fill="#cfd8e3"/>
+<g font-family="monospace" font-weight="700" font-size="9.5" fill="#39e07a"><text x="31" y="29">0 1 0 1 1 0</text><text x="31" y="42">1 0 1 0 0 1</text><text x="31" y="55">0 1 1 0 1 0</text></g>
+<rect x="14" y="82" width="62" height="20" rx="4" fill="#2c3340" stroke="#aab4c3" stroke-width="2"/>
+<g fill="#aab4c3"><rect x="19" y="86" width="7" height="5" rx="1"/><rect x="28" y="86" width="7" height="5" rx="1"/><rect x="37" y="86" width="7" height="5" rx="1"/><rect x="46" y="86" width="7" height="5" rx="1"/><rect x="55" y="86" width="7" height="5" rx="1"/><rect x="64" y="86" width="7" height="5" rx="1"/><rect x="24" y="93" width="38" height="5" rx="1"/></g>
+<path d="M44 82C44 74 58 76 60 70" stroke="#aab4c3" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M76 92H82" stroke="#aab4c3" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M94 80C94 70 104 72 104 62" stroke="#aab4c3" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".0"/>
+<rect x="82" y="80" width="24" height="30" rx="12" fill="#e9edf3" stroke="#aab4c3" stroke-width="2"/>
+<path d="M94 80V93M82 93H106" stroke="#aab4c3" stroke-width="2"/>
+<path d="M94 80C94 74 100 74 100 70" stroke="#aab4c3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTpjYWE1MTMxMS1kMDJkLTRjMmItYmQwMS01OWI0NjdhOTYxY2YAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaDXdEyHW9neCc3g9yAfAY8EAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDoyNGFhZDczZS1jNDE0LTRiN2YtYmZhZS1lY2UwMWJjZDk1YzRscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoQ6y8qWMpmxPpWOhhcHptCwAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggY9rZsZN5gmzfAHgrQK8qA9VMobWONlp9RqDpUALakMqkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaKowlJSo/ZrtspNt8LZz/WUAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYICwkz+VFQNpn40CbUCfBfCMfkvJma0cTQx4ceCRGQxNyZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GQepZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOmNhYTUxMzExLWQwMmQtNGMyYi1iZDAxLTU5YjQ2N2E5NjFjZi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOmNmZDVkNWM4LWVjMDItNDc5My05MGY1LTY3ZDkwNDdlYjEzZHJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBj2tmxk3mCbN8AeCtAryoD1UyhtY42Wn1GoOlQAtqQyqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggWOPSi5i9UfcFYyqROgX59qbpUZ+0O6TO4xZ/9ZEYOx+iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg1HzM2EiKC5haQmublc5OsacQgrspIaOTB2/hp69wKd10Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQGD7gZ1H5o6/LGd32FjXuhd+ZyhKvWvkBB4uMjRe4zA4BJ67ntW0E3A2g6Tg7aOvmy1YJN8lkeZ3EeBpw9Xrdqc=</c2pa:manifest></metadata></svg>
+<div><h1>Jamii Harness</h1><p>An open, model-agnostic harness where a teacher stays in charge of an AI tutor. Part of <a href="index.html">Jamii Digital</a>.</p></div></header>
+<main id="main">
+<div class="banner" role="note"><b>Synthetic data only.</b> Six pretend students (S1 to S6) and no real names. Nothing leaves your browser unless you choose an outside model below. The harness <b>recommends</b>; you <b>decide</b>. This is a research prototype, not a product, and its numbers are a smoke test, not evidence of learning gains.</div>
+
+<section aria-labelledby="h-class"><h2 id="h-class">1. The classroom</h2>
+<p class="dim" id="skill"></p>
+<div class="scroll"><table id="roster"><caption class="dim" style="text-align:left">Pseudonymous students. Groups A, B and C are classroom groups.</caption><thead><tr><th>Student</th><th>Group</th><th>Mastery</th><th>Hints used</th><th>Mood</th><th>Common errors</th></tr></thead><tbody></tbody></table></div>
+<h3>What the teacher asked for</h3><p id="tin" class="dim"></p></section>
+
+<section aria-labelledby="h-task"><h2 id="h-task">2. Ask the harness for help</h2>
+<p>Pick a task. Each one builds a small, task-specific context, calls the model, checks the answer against a schema, and returns a <b>proposal</b> that waits for you.</p>
+<div class="row" role="group" aria-label="Tasks">
+<button class="pri" data-task="adaptPlan">Adapt the lesson plan</button>
+<button class="pri" data-task="differentiate">Differentiate for each student</button>
+<button class="pri" data-task="strategySupport">Support one student</button>
+<button class="pri" data-task="goalsTracking">Set and track goals</button></div>
+<div id="ss" hidden><label for="stu">Which student for "Support one student"?</label><select id="stu"></select></div>
+<details><summary>Model settings (optional)</summary>
+<p class="dim">Default is a built-in reference model that runs offline and needs no key. You can instead use any OpenAI-compatible endpoint, including open-weight models you host yourself (for example Ollama or vLLM). Your key stays in this page's memory and is never saved. Only pseudonymous ids and scrubbed text are sent.</p>
+<div class="grid"><div><label for="mk">Model</label><select id="mk"><option value="ref">Reference model (offline)</option><option value="oai">OpenAI-compatible endpoint</option></select></div>
+<div><label for="mu">Base URL</label><input id="mu" value="http://localhost:11434/v1" autocomplete="off"></div>
+<div><label for="mn">Model name</label><input id="mn" value="llama3" autocomplete="off"></div>
+<div><label for="mkey">API key (optional)</label><input id="mkey" type="password" autocomplete="off"></div></div>
+<p class="dim">If the endpoint fails or answers badly, the harness falls back to the reference model and says so.</p></details></section>
+
+<section aria-labelledby="h-prop"><h2 id="h-prop">3. Proposals waiting for you</h2>
+<div id="status" class="dim" role="status" aria-live="polite">Nothing yet. Choose a task above.</div>
+<div id="props"></div></section>
+
+<section aria-labelledby="h-audit"><h2 id="h-audit">4. Audit log</h2>
+<p class="dim">Every proposal and decision is recorded. Export it to share with a school, a researcher or an auditor.</p>
+<div class="row"><button id="exp">Download the trace (JSON)</button></div><pre id="audit" aria-live="polite">No events yet.</pre></section>
+
+<section aria-labelledby="h-gov"><h2 id="h-gov">How this harness is built</h2>
+<ul>
+<li><b>Open:</b> MIT code, CC-BY-4.0 data, zero dependencies. Public goods (misconception sets, skills) are loaded through a registry that only accepts open licenses.</li>
+<li><b>Model-agnostic:</b> swap the reference model for any OpenAI-compatible model, including open-weight models.</li>
+<li><b>Context you can see:</b> each proposal shows exactly what was put in the model's context, what was dropped for budget, and why.</li>
+<li><b>Grounded in learning science:</b> misconceptions, productive struggle, zone of proximal development, cognitive load and teacher agency.</li>
+<li><b>Human in the loop:</b> nothing is applied until a teacher approves, edits or rejects it.</li>
+<li><b>Privacy by design:</b> pseudonymous ids only, names are rejected, emails and phone numbers are masked, and nothing is stored on a server.</li>
+<li><b>Fairness check:</b> a plain table of support levels by group, so a teacher can notice patterns.</li></ul></section>
+</main>
+<footer style="text-align:center"><p style="margin:0 0 12px"><b style="color:var(--navy);font-size:1.15rem">Jamii Digital</b><br>Building digitally robust &amp; resilient communities</p>Jamii Harness v<span id="ver"></span>. Code: MIT. Sample data: CC-BY-4.0. Honest limits: the reference model is rule-based, results are not yet validated in real classrooms, and outside models are untested here.</footer>
+<script>
+// Jamii Harness v0.1.0 (Phase 1 prototype). MIT License. Zero dependencies.
+// A small, model-agnostic harness that orchestrates context + a model + teacher approval
+// for formative-assessment coordination between a teacher and an AI tutor.
+const VERSION = '0.1.0';
+const est = t => Math.ceil(String(t).length / 4); // rough token estimate, no tokenizer needed
+
+/* ---------- Guards ---------- */
+function maskPII(text) {
+  return String(text)
+    .replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, '[email]')
+    .replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[id]')
+    .replace(/\+?\d[\d\s().-]{8,}\d/g, '[phone]');
+}
+function assertPseudonymous(students) {
+  for (const s of students) {
+    if (!/^[A-Za-z0-9_-]{1,12}$/.test(String(s.id))) throw new Error('Student ids must be short pseudonyms (letters/digits).');
+    for (const k of ['name', 'fullName', 'email', 'phone', 'address', 'dob'])
+      if (k in s) throw new Error('Field "' + k + '" is not allowed. Use pseudonymous ids only.');
+  }
+}
+const BOUNDARY = /\b(diagnos|disorder|disabilit|medicat|final grade|retain|expel|punish)\w*/i;
+
+/* ---------- Learning-science skills (the "context" the harness can load) ---------- */
+const SKILLS = [
+  { id: 'misconceptions', tasks: ['adaptPlan', 'differentiate', 'strategySupport'], concept: 'Misconceptions',
+    text: 'Name the specific misconception behind repeated errors, then repair it with a targeted representation before more practice.' },
+  { id: 'productive-struggle', tasks: ['differentiate', 'strategySupport', 'goalsTracking'], concept: 'Productive struggle',
+    text: 'Learners benefit from effort before help. Delay hints until the learner has tried and explained their thinking. Stop struggle when it turns into repeated, unproductive failure.' },
+  { id: 'zpd', tasks: ['differentiate', 'adaptPlan'], concept: 'Zone of proximal development',
+    text: 'Aim the next task slightly above current mastery (about +0.15) with scaffolds that fade as mastery grows.' },
+  { id: 'cognitive-load', tasks: ['adaptPlan', 'differentiate', 'strategySupport'], concept: 'Cognitive load',
+    text: 'When a learner is overloaded, reduce extraneous load: one idea at a time, a worked example, then fade support.' },
+  { id: 'teacher-agency', tasks: ['adaptPlan', 'differentiate', 'strategySupport', 'goalsTracking'], concept: 'Teacher agency',
+    text: 'Recommend, never decide. Respect teacher constraints exactly. Escalate to the teacher when a student seems disengaged or distressed.' }
+];
+
+/* ---------- Public goods registry (adapters) ---------- */
+class PublicGoods {
+  constructor() { this.goods = new Map(); }
+  register(good) { // {id, type, license, version, source, items | load()}
+    if (!good.id || !good.license) throw new Error('A public good needs an id and a license.');
+    if (!/^(CC-BY-4\.0|MIT|Apache-2\.0|CC0-1\.0)$/.test(good.license)) throw new Error('License not accepted by this program: ' + good.license);
+    this.goods.set(good.id, good);
+  }
+  async items(id) { const g = this.goods.get(id); if (!g) return []; return g.items || (g.load ? await g.load() : []); }
+  list() { return [...this.goods.values()].map(g => ({ id: g.id, type: g.type, license: g.license, version: g.version || '', source: g.source || '' })); }
+}
+
+/* ---------- Reference model: deterministic, offline, auditable ---------- */
+const byCode = (mis, code) => (mis || []).find(m => m.code === code);
+const topError = s => { const c = {}; (s.errors || []).forEach(e => c[e] = (c[e] || 0) + 1); return Object.entries(c).sort((a, b) => b[1] - a[1])[0]; };
+const REF = {
+  adaptPlan({ students, misconceptions }) {
+    const tally = {}; students.forEach(s => (s.errors || []).forEach(e => (tally[e] = tally[e] || new Set()).add(s.id)));
+    const items = [];
+    Object.entries(tally).sort((a, b) => b[1].size - a[1].size).forEach(([code, ids]) => {
+      const m = byCode(misconceptions, code) || { name: code, repair: 'Re-teach with a worked example.' };
+      if (ids.size >= 2) items.push({ type: 'reteach', target: [...ids].sort().join(','), misconception: code, action: 'Add a 5-minute mini-lesson: ' + m.repair, rationale: ids.size + ' students show "' + m.name + '". Repair the misconception before more practice.', concept: 'Misconceptions' });
+    });
+    students.filter(s => s.mastery >= 0.75 && !(s.errors || []).length).forEach(s => items.push({ type: 'extend', target: s.id, misconception: '', action: 'Offer a challenge one step harder (mixed-number sums).', rationale: 'Mastery ' + s.mastery + ' with no errors. Keep the task inside the zone of proximal development.', concept: 'Zone of proximal development' }));
+    const overloaded = students.filter(s => s.mood === 'frustrated' && s.hintsUsed >= 4);
+    if (overloaded.length) items.push({ type: 'strategy', target: overloaded.map(s => s.id).sort().join(','), misconception: '', action: 'Reduce load: show one worked example, then a matching problem with fewer steps.', rationale: 'Frustration with heavy hint use suggests overload.', concept: 'Cognitive load' });
+    return { task: 'adaptPlan', items };
+  },
+  differentiate({ students, teacherInput, misconceptions }) {
+    const minTries = /try before/i.test(teacherInput && teacherInput.focus || '') ? 2 : 1;
+    const plans = students.map(s => {
+      const te = topError(s), m = te && byCode(misconceptions, te[0]);
+      const scaffold = s.mastery < 0.4 ? 'worked example, then faded steps' : s.mastery < 0.7 ? 'guided hint ladder' : 'challenge with minimal hints';
+      return { student: s.id, targetDifficulty: Math.min(1, +(s.mastery + 0.15).toFixed(2)), scaffold, focusMisconception: te ? te[0] : '', tutorInstruction: 'Ask the student to try ' + minTries + ' time(s) and explain their thinking before giving a hint. ' + (m ? 'Then repair: ' + m.repair : 'Then extend with a harder problem.'), teacherNote: (teacherInput && teacherInput.pairing && teacherInput.pairing.includes(s.id)) ? 'Teacher constraint: ' + teacherInput.pairing : '' };
+    });
+    return { task: 'differentiate', plans };
+  },
+  strategySupport({ student }) {
+    const sg = student.signals || {};
+    if (sg.mood === 'disengaged') return { task: 'strategySupport', student: student.id, recommendation: 'Pause the tutor and ask the teacher to check in.', why: 'Signals of disengagement. A person should respond.', escalateToTeacher: true };
+    if (sg.mood === 'frustrated' && (sg.repeatedError || 0) >= 3) return { task: 'strategySupport', student: student.id, recommendation: 'Stop hints. Show a worked example for the repeated error, then a similar problem with one fewer step.', why: 'The same error three or more times is unproductive struggle and a sign of high cognitive load.', escalateToTeacher: (sg.hintsUsed || 0) >= 4 };
+    if ((sg.attempts || 0) < 3 && (sg.minutes || 0) < 5 && (sg.hintsUsed || 0) >= 2) return { task: 'strategySupport', student: student.id, recommendation: 'Hold back the next hint. Ask: "What have you tried, and what do you notice?"', why: 'Hints arrived before real effort. Productive struggle builds understanding.', escalateToTeacher: false };
+    return { task: 'strategySupport', student: student.id, recommendation: 'Continue as planned and keep the hint ladder.', why: 'No warning signals.', escalateToTeacher: false };
+  },
+  goalsTracking({ tutorStats, teacherInput }) {
+    const goals = [];
+    if (tutorStats.avgSecondsBeforeHint < 30) goals.push({ owner: 'tutor', metric: 'avgSecondsBeforeHint', baseline: tutorStats.avgSecondsBeforeHint, target: 30, how: 'Wait for an attempt before offering a hint.', review: 'weekly' });
+    if (tutorStats.avgHintsPerStudent > 1.5) goals.push({ owner: 'tutor', metric: 'avgHintsPerStudent', baseline: tutorStats.avgHintsPerStudent, target: 1.5, how: 'Use the hint ladder: nudge, then example, then step.', review: 'weekly' });
+    goals.push({ owner: 'teacher', metric: 'frustratedStudentCheckins', baseline: 0, target: 2, how: 'Check in with students the harness flags, and record what helped.', review: 'weekly' });
+    if (teacherInput && teacherInput.focus) goals.push({ owner: 'teacher', metric: 'goalAlignment', baseline: 'unset', target: 'agreed', how: 'Teacher goal: ' + teacherInput.focus, review: 'monthly' });
+    return { task: 'goalsTracking', goals };
+  }
+};
+class ReferenceModel {
+  constructor() { this.name = 'reference-model (deterministic, offline)'; }
+  async complete(req) { return JSON.stringify(REF[req.task](req.input)); }
+}
+/* Any OpenAI-compatible endpoint, including open-weight models served locally (Ollama, vLLM, llama.cpp). */
+class OpenAICompatModel {
+  constructor({ baseUrl, apiKey = '', model, fetchImpl }) { Object.assign(this, { baseUrl: baseUrl.replace(/\/$/, ''), apiKey, model, fetchImpl: fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(globalThis) : null) }); this.name = model + ' via ' + baseUrl; }
+  async complete(req) {
+    const headers = { 'Content-Type': 'application/json' }; if (this.apiKey) headers.Authorization = 'Bearer ' + this.apiKey;
+    const r = await this.fetchImpl(this.baseUrl + '/chat/completions', { method: 'POST', headers, body: JSON.stringify({ model: this.model, temperature: 0.2, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: req.system }, { role: 'user', content: req.prompt }] }) });
+    if (!r.ok) throw new Error('Model endpoint returned ' + r.status);
+    const j = await r.json(); return j.choices[0].message.content;
+  }
+}
+
+/* ---------- Output validation ---------- */
+const SCHEMA = {
+  adaptPlan: o => Array.isArray(o.items) && o.items.every(i => i.type && i.action && i.rationale),
+  differentiate: o => Array.isArray(o.plans) && o.plans.every(p => p.student && p.scaffold && p.tutorInstruction),
+  strategySupport: o => o.student && o.recommendation && o.why && typeof o.escalateToTeacher === 'boolean',
+  goalsTracking: o => Array.isArray(o.goals) && o.goals.every(g => g.owner && g.metric && g.how)
+};
+const TASKS = Object.keys(SCHEMA);
+const scrub = v => typeof v === 'string' ? maskPII(v) : Array.isArray(v) ? v.map(scrub) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, scrub(x)])) : v;
+const flatText = v => typeof v === 'string' ? v : Array.isArray(v) ? v.map(flatText).join(' ') : v && typeof v === 'object' ? Object.values(v).map(flatText).join(' ') : '';
+
+/* ---------- Fairness audit (descriptive, for the teacher) ---------- */
+function auditFairness(students, output) {
+  const grp = Object.fromEntries(students.map(s => [s.id, s.group || 'all']));
+  const rows = {}; const bump = (g, k) => { rows[g] = rows[g] || { n: 0, reteach: 0, workedExample: 0, escalate: 0 }; rows[g][k]++; };
+  students.forEach(s => { rows[grp[s.id]] = rows[grp[s.id]] || { n: 0, reteach: 0, workedExample: 0, escalate: 0 }; rows[grp[s.id]].n++; });
+  (output.plans || []).forEach(p => { if (/worked example/.test(p.scaffold)) bump(grp[p.student] || 'all', 'workedExample'); });
+  (output.items || []).forEach(i => String(i.target).split(',').forEach(t => { if (i.type === 'reteach' && grp[t]) bump(grp[t], 'reteach'); }));
+  if (output.escalateToTeacher && output.student) bump(grp[output.student] || 'all', 'escalate');
+  const rates = Object.entries(rows).map(([g, r]) => ({ group: g, n: r.n, workedExampleRate: +(r.workedExample / r.n).toFixed(2), reteachRate: +(r.reteach / r.n).toFixed(2) }));
+  const mx = Math.max(...rates.map(r => r.workedExampleRate)), mn = Math.min(...rates.map(r => r.workedExampleRate));
+  const flags = (mx > 0 && rates.length > 1 && (mn === 0 || mx / mn >= 2)) ? ['Support levels differ across groups (' + mx + ' vs ' + mn + '). Check that differences reflect need, not group labels.'] : [];
+  return { rates, flags, note: 'Groups here are classroom groups. Any use of demographic groups needs consent and ethics review.' };
+}
+
+/* ---------- The harness ---------- */
+function createHarness({ model = new ReferenceModel(), goods = new PublicGoods(), budgetTokens = 1200, memory = [] } = {}) {
+  const proposals = new Map(), audit = []; let seq = 0;
+  const log = (event, detail) => audit.push({ t: seq++, event, ...detail });
+  async function buildContext(task, input) {
+    const items = [{ kind: 'system', id: 'system', text: 'You help a teacher plan formative assessment with an AI tutor. Respond with JSON only. Recommend; the teacher decides. Use only the pseudonymous ids given.', why: 'always' }];
+    SKILLS.filter(s => s.tasks.includes(task)).forEach(s => items.push({ kind: 'skill', id: s.id, text: s.text, why: 'relevant to ' + task + ' (' + s.concept + ')' }));
+    memory.filter(m => m.tasks.includes(task)).forEach(m => items.push({ kind: 'memory', id: m.id, text: m.text, why: 'teacher memory for ' + task }));
+    for (const g of goods.list()) { const it = await goods.items(g.id); if (it.length) items.push({ kind: 'public-good', id: g.id, text: JSON.stringify(it), why: 'public good (' + g.license + ') supplies repair strategies' }); }
+    let used = 0; const trace = [];
+    for (const it of items) { const t = est(it.text); const ok = used + t <= budgetTokens || it.kind === 'system'; if (ok) used += t; trace.push({ kind: it.kind, id: it.id, tokens: t, included: ok, why: ok ? it.why : 'dropped: over the ' + budgetTokens + '-token budget' }); it.included = ok; }
+    return { items: items.filter(i => i.included), trace, tokens: used };
+  }
+  async function run(task, rawInput) {
+    if (!SCHEMA[task]) throw new Error('Unknown task: ' + task);
+    const input = scrub(rawInput); if (input.students) assertPseudonymous(input.students); if (input.student) assertPseudonymous([input.student]);
+    const ctx = await buildContext(task, input);
+    const misconceptions = []; for (const g of goods.list()) (await goods.items(g.id)).forEach(i => { if (i.code) misconceptions.push(i); });
+    const req = { task, input: { ...input, misconceptions }, system: ctx.items.find(i => i.kind === 'system').text, prompt: ctx.items.filter(i => i.kind !== 'system').map(i => '[' + i.kind + ':' + i.id + '] ' + i.text).join('\n') + '\nTASK: ' + task + '\nINPUT: ' + JSON.stringify(input) + '\nReturn JSON for the task.' };
+    const t0 = Date.now(); let out, fellBack = false, schemaOk = true, err = '';
+    try { out = JSON.parse(await model.complete(req)); if (!SCHEMA[task](out)) throw new Error('Output did not match the task schema'); }
+    catch (e) { schemaOk = false; err = e.message; out = JSON.parse(await new ReferenceModel().complete(req)); fellBack = true; }
+    out = scrub(out); const flags = BOUNDARY.test(flatText(out)) ? ['Output touches a topic reserved for the teacher or specialists. Review carefully.'] : [];
+    const p = { id: 'P' + (++seq), task, status: 'pending', output: out, flags, fairness: auditFairness(input.students || (input.student ? [input.student] : []), out), trace: { model: model.name, latencyMs: Date.now() - t0, schemaOk, fellBack, error: err, tokens: ctx.tokens, context: ctx.trace } };
+    proposals.set(p.id, p); log('proposed', { id: p.id, task, fellBack }); return p;
+  }
+  function decide(id, decision, { edit, note } = {}) {
+    const p = proposals.get(id); if (!p) throw new Error('No such proposal'); if (!['approve', 'edit', 'reject'].includes(decision)) throw new Error('Decision must be approve, edit or reject');
+    if (decision === 'edit') { if (!edit) throw new Error('Provide the edited output'); p.output = scrub(edit); }
+    p.status = decision === 'reject' ? 'rejected' : 'approved'; p.note = maskPII(note || ''); log(decision, { id, note: p.note }); return p;
+  }
+  function apply(id, effect) { const p = proposals.get(id); if (!p || p.status !== 'approved') throw new Error('Teacher approval is required before anything is applied.'); log('applied', { id }); return effect ? effect(p.output) : p.output; }
+  return { run, decide, apply, get: id => proposals.get(id), audit: () => audit.slice(), exportTrace: () => JSON.stringify({ version: VERSION, audit, proposals: [...proposals.values()] }, null, 2), goods };
+}
+
+const ROOM={"_license": "CC-BY-4.0", "_note": "Entirely synthetic. No real students. Pseudonymous ids only.", "skill": "Adding fractions with unlike denominators (grade 5)", "students": [{"id": "S1", "group": "A", "mastery": 0.3, "attempts": 5, "minutes": 9, "errors": ["add-denominators", "add-denominators", "add-denominators"], "hintsUsed": 4, "mood": "frustrated"}, {"id": "S2", "group": "A", "mastery": 0.55, "attempts": 3, "minutes": 6, "errors": ["no-simplify", "add-denominators"], "hintsUsed": 1, "mood": "engaged"}, {"id": "S3", "group": "B", "mastery": 0.8, "attempts": 2, "minutes": 4, "errors": [], "hintsUsed": 0, "mood": "engaged"}, {"id": "S4", "group": "B", "mastery": 0.45, "attempts": 6, "minutes": 12, "errors": ["wrong-common-denominator", "wrong-common-denominator"], "hintsUsed": 5, "mood": "frustrated"}, {"id": "S5", "group": "C", "mastery": 0.65, "attempts": 2, "minutes": 3, "errors": ["no-simplify"], "hintsUsed": 0, "mood": "bored"}, {"id": "S6", "group": "C", "mastery": 0.2, "attempts": 1, "minutes": 1, "errors": ["add-denominators"], "hintsUsed": 3, "mood": "disengaged"}], "teacherInput": {"focus": "Wants students to try before getting hints", "pairing": "Avoid pairing S1 with S6"}, "tutorStats": {"avgHintsPerStudent": 2.2, "avgSecondsBeforeHint": 14, "workedExamplesShown": 2}};const MIS={"_license": "CC-BY-4.0", "_note": "Synthetic starter set for the prototype. Replace with real public goods through the adapter interface.", "id": "sample-misconceptions-fractions", "version": "0.1.0", "skill": "adding-fractions-unlike-denominators", "items": [{"code": "add-denominators", "name": "Adds numerators and denominators separately (1/2 + 1/3 = 2/5)", "repair": "Use a fraction bar to show 1/2 and 1/3 are different-sized pieces, then find equal-sized pieces.", "strategy": "visual-model"}, {"code": "wrong-common-denominator", "name": "Picks a common denominator that is not a multiple of both", "repair": "List multiples of each denominator and circle the first one they share.", "strategy": "multiples-list"}, {"code": "no-simplify", "name": "Stops before simplifying the answer", "repair": "Ask: can both numbers be divided by the same number? Practise finding common factors.", "strategy": "factor-check"}]};
+const $=id=>document.getElementById(id);const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('ver').textContent=VERSION;$('skill').textContent='Skill: '+ROOM.skill;
+$('tin').textContent=Object.entries(ROOM.teacherInput).map(([k,v])=>k+': '+v).join(' · ');
+$('roster').tBodies[0].innerHTML=ROOM.students.map(s=>`<tr><td>${esc(s.id)}</td><td>${esc(s.group)}</td><td>${s.mastery}</td><td>${s.hintsUsed}</td><td>${esc(s.mood)}</td><td>${esc([...new Set(s.errors)].join(', ')||'none')}</td></tr>`).join('');
+$('stu').innerHTML=ROOM.students.map(s=>`<option>${s.id}</option>`).join('');
+const goods=new PublicGoods();goods.register({id:MIS.id,type:'misconception-set',license:MIS.license||'CC-BY-4.0',version:MIS.version,items:MIS.items});
+let H;function build(){let model=new ReferenceModel();if($('mk').value==='oai')model=new OpenAICompatModel({baseUrl:$('mu').value,apiKey:$('mkey').value,model:$('mn').value});H=createHarness({model,goods})}
+build();['mk','mu','mn','mkey'].forEach(i=>$(i).addEventListener('change',build));
+const T={adaptPlan:'Adapt the lesson plan',differentiate:'Differentiate for each student',strategySupport:'Support one student',goalsTracking:'Set and track goals'};
+function body(p){const o=p.output;
+if(o.items)return o.items.length?o.items.map(i=>`<div class="item"><b>${esc(i.type)}</b> for ${esc(i.target)}: ${esc(i.action)}<br><small>Why: ${esc(i.rationale)} (${esc(i.concept)})</small></div>`).join(''):'<p>No changes suggested.</p>';
+if(o.plans)return `<div class="scroll"><table><thead><tr><th>Student</th><th>Next level</th><th>Support</th><th>Tutor should</th></tr></thead><tbody>${o.plans.map(x=>`<tr><td>${esc(x.student)}</td><td>${x.targetDifficulty}</td><td>${esc(x.scaffold)}</td><td>${esc(x.tutorInstruction)}${x.teacherNote?`<br><span class="tag ok">${esc(x.teacherNote)}</span>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+if(o.goals)return o.goals.map(g=>`<div class="item"><b>${esc(g.owner)}</b>: ${esc(g.metric)} ${g.baseline!==undefined?'from '+esc(g.baseline):''} ${g.target!==undefined?'to '+esc(g.target):''}<br><small>How: ${esc(g.how)}${g.review?' · review '+esc(g.review):''}</small></div>`).join('');
+return `<div class="item"><b>${esc(o.student)}</b>: ${esc(o.recommendation)}<br><small>Why: ${esc(o.why)}</small>${o.escalateToTeacher?'<br><span class="tag warn">Please check in with this student yourself</span>':''}</div>`}
+function card(p){const t=p.trace;
+const ctx=t.context.map(c=>`<tr><td class="${c.included?'':'drop'}">${esc(c.kind)}: ${esc(c.id)}</td><td>${c.tokens}</td><td>${c.included?'in':'dropped'}</td><td>${esc(c.why)}</td></tr>`).join('');
+const fr=p.fairness.rates.map(r=>`<tr><td>${esc(r.group)}</td><td>${r.n}</td><td>${r.workedExampleRate}</td><td>${r.reteachRate}</td></tr>`).join('');
+const ctl=p.status==='pending'?`<div class="row"><button class="pri" data-d="approve" data-id="${p.id}">Approve</button><button data-d="edit" data-id="${p.id}">Edit</button><button data-d="reject" data-id="${p.id}">Reject</button></div><div id="ed-${p.id}" hidden><label for="ta-${p.id}">Edit the proposal (JSON), then save</label><textarea id="ta-${p.id}">${esc(JSON.stringify(p.output,null,2))}</textarea><div class="row"><button class="pri" data-d="save" data-id="${p.id}">Save and approve</button></div></div>`:`<p><span class="tag ${p.status==='approved'?'ok':'warn'}">${p.status}</span> ${p.status==='approved'?'Only now could a school system apply this.':''}</p>`;
+return `<article class="prop ${p.status}" id="${p.id}"><h3 style="margin-top:0">${esc(T[p.task])} <span class="tag">${p.id}</span></h3>
+${t.fellBack?`<p><span class="tag warn">The chosen model failed (${esc(t.error)}). The reference model answered instead.</span></p>`:''}
+${p.flags.map(f=>`<p><span class="tag warn">${esc(f)}</span></p>`).join('')}${body(p)}${ctl}
+<details><summary>Context trace: what the model was shown</summary><p class="dim">Model: ${esc(t.model)} · ${t.tokens} tokens · ${t.latencyMs} ms · schema ${t.schemaOk?'ok':'failed'}</p><div class="scroll"><table><thead><tr><th>Item</th><th>Tokens</th><th></th><th>Why</th></tr></thead><tbody>${ctx}</tbody></table></div></details>
+<details><summary>Fairness table</summary><div class="scroll"><table><thead><tr><th>Group</th><th>Students</th><th>Worked-example rate</th><th>Re-teach rate</th></tr></thead><tbody>${fr}</tbody></table></div>${p.fairness.flags.map(f=>`<p class="tag warn">${esc(f)}</p>`).join('')}<p class="dim">${esc(p.fairness.note)}</p></details></article>`}
+const props=[];function draw(){$('props').innerHTML=props.slice().reverse().map(id=>card(H.get(id))).join('');$('audit').textContent=H.audit().length?H.audit().map(a=>`#${a.t} ${a.event} ${a.id}${a.note?' — '+a.note:''}${a.fellBack?' (fell back)':''}`).join('\n'):'No events yet.'}
+document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.task){const k=b.dataset.task;$('ss').hidden=k!=='strategySupport';let inp={students:ROOM.students,tutorStats:ROOM.tutorStats,teacherInput:ROOM.teacherInput};
+if(k==='strategySupport'){const s=ROOM.students.find(x=>x.id===$('stu').value);inp={student:{id:s.id,group:s.group,signals:{mood:s.mood,hintsUsed:s.hintsUsed,attempts:s.attempts,minutes:s.minutes,repeatedError:Math.max(0,...Object.values(s.errors.reduce((c,x)=>(c[x]=(c[x]||0)+1,c),{})))}}}}
+$('status').textContent='Working…';try{const p=await H.run(k,inp);props.push(p.id);$('status').textContent='New proposal ready. It is waiting for your decision.';draw();$(p.id).scrollIntoView({block:'nearest'})}catch(err){$('status').textContent='Could not run: '+err.message}return}
+if(b.dataset.d){const id=b.dataset.id,d=b.dataset.d;
+if(d==='edit'){$('ed-'+id).hidden=false;$('ta-'+id).focus();return}
+try{if(d==='save')H.decide(id,'edit',{edit:JSON.parse($('ta-'+id).value),note:'edited by teacher'});else H.decide(id,d);$('status').textContent='Proposal '+id+' '+(d==='reject'?'rejected':'approved')+'.'}catch(err){$('status').textContent='Not saved: '+err.message}draw()}
+if(b.id==='exp'){try{if(window.claude&&claude.use){const d=await claude.use('downloads');if(d){await d.save({filename:'jamii-harness-trace.json',data:H.exportTrace()});return}}}catch(err){}const u=URL.createObjectURL(new Blob([H.exportTrace()],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='jamii-harness-trace.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}});
+</script></body></html>

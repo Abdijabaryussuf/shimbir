@@ -1,0 +1,11 @@
+{"_license":"CC-BY-4.0","_note":"Entirely synthetic. No real students. Pseudonymous ids only.",
+"skill":"Adding fractions with unlike denominators (grade 5)",
+"students":[
+ {"id":"S1","group":"A","mastery":0.30,"attempts":5,"minutes":9,"errors":["add-denominators","add-denominators","add-denominators"],"hintsUsed":4,"mood":"frustrated"},
+ {"id":"S2","group":"A","mastery":0.55,"attempts":3,"minutes":6,"errors":["no-simplify","add-denominators"],"hintsUsed":1,"mood":"engaged"},
+ {"id":"S3","group":"B","mastery":0.80,"attempts":2,"minutes":4,"errors":[],"hintsUsed":0,"mood":"engaged"},
+ {"id":"S4","group":"B","mastery":0.45,"attempts":6,"minutes":12,"errors":["wrong-common-denominator","wrong-common-denominator"],"hintsUsed":5,"mood":"frustrated"},
+ {"id":"S5","group":"C","mastery":0.65,"attempts":2,"minutes":3,"errors":["no-simplify"],"hintsUsed":0,"mood":"bored"},
+ {"id":"S6","group":"C","mastery":0.20,"attempts":1,"minutes":1,"errors":["add-denominators"],"hintsUsed":3,"mood":"disengaged"}],
+"teacherInput":{"focus":"Wants students to try before getting hints","pairing":"Avoid pairing S1 with S6"},
+"tutorStats":{"avgHintsPerStudent":2.2,"avgSecondsBeforeHint":14,"workedExamplesShown":2}}

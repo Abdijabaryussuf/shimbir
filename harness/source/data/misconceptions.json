@@ -1,0 +1,6 @@
+{"_license":"CC-BY-4.0","_note":"Synthetic starter set for the prototype. Replace with real public goods through the adapter interface.",
+"id":"sample-misconceptions-fractions","version":"0.1.0","skill":"adding-fractions-unlike-denominators",
+"items":[
+ {"code":"add-denominators","name":"Adds numerators and denominators separately (1/2 + 1/3 = 2/5)","repair":"Use a fraction bar to show 1/2 and 1/3 are different-sized pieces, then find equal-sized pieces.","strategy":"visual-model"},
+ {"code":"wrong-common-denominator","name":"Picks a common denominator that is not a multiple of both","repair":"List multiples of each denominator and circle the first one they share.","strategy":"multiples-list"},
+ {"code":"no-simplify","name":"Stops before simplifying the answer","repair":"Ask: can both numbers be divided by the same number? Practise finding common factors.","strategy":"factor-check"}]}

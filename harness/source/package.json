@@ -1,0 +1,1 @@
+{"name":"jamii-harness","version":"0.1.0","type":"module","license":"MIT","main":"src/harness.js","scripts":{"test":"node --test","build":"python3 build.py"}}
