@@ -1520,16 +1520,29 @@ rem:['Choose reliable sources','Look for author, date and sources','Beware of mi
 
 const strip=h=>String(h).replace(/<[^>]+>/g,'');
 const BADG=['Share your password if asked nicely','Click the link to check','Pay with a gift card to be safe','Ignore it and hope for the best','Give the code to the caller','Trust a caller who knows your name'];
-function AUTOQ(g){const o=[];g.steps.forEach((s,i)=>{if(s.f){s.f.forEach((x,j)=>o.push(['Which is a good habit for: '+g.t+'?',x,s.x[j%s.x.length],s.x[(j+1)%s.x.length],'Look for the careful, safe habit.']))}else o.push([strip(s.m),s.a[0],s.a[1],s.a[2],s.w||'']);});
-g.rem.forEach((r,i)=>o.push(['Which is true about: '+g.t+'?',r,BADG[i%6],BADG[(i+2)%6],'Think about what you learned in this room.']));return o}
-function GEN(arr){arr.forEach(g=>{const scr={},st=[];const n=g.steps.length;
+const AQP={r:[],w:[]};
+function AUTOQ(g){const o=[];const h=String(g.k||g.t||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0),tt=g.t.replace(/^Practice:\s*/i,'');
+const far=(arr,own,n)=>{const out=[];for(let t=0;t<arr.length&&out.length<n;t++){const x=arr[(h*7+t*13+t*t)%arr.length];if(x&&own.indexOf(x)<0&&out.indexOf(x)<0&&x.length<150)out.push(x)}return out};
+g.rem.slice(0,3).forEach((r,ri)=>{const d=far(AQP.r,g.rem,2);if(d.length===2)o.push([['Which reminder goes with: '+tt+(/\?$/.test(tt)?'':'?'),'Which of these is also advice from this lesson?','Pick the tip that belongs to this lesson.'][ri],r,d[0],d[1],'That is the tip taught in this lesson.'])});
+let nw=0;g.steps.forEach(s=>{if(nw>=2||!s.w||s.f||!s.a)return;const d=far(AQP.w,[s.w],2);if(d.length===2){o.push(['Why is this the better choice: “'+s.a[0].replace(/[.!?]+$/,'')+'”?',s.w,d[0],d[1],'That is the reason given in the lesson.']);nw++}});
+if(o.length<3)g.steps.forEach((s,i)=>{if(o.length>=3||s.f||!s.a)return;o.push([strip(s.m),s.a[0],s.a[1],s.a[2],s.w||''])});
+return o}
+function GEN(arr){arr.forEach(g=>{g.rem.forEach(x=>AQP.r.push(x));g.steps.forEach(x=>x.w&&AQP.w.push(x.w))});arr.forEach(g=>{const scr={},st=[];const n=g.steps.length;
 g.steps.forEach((s,i)=>{const id='s'+i,nx=i+1<n?'s'+(i+1):'ok';let h=(i?OK('Good ✓'):'')+MG(s.m);
 if(s.f){const items=[...s.f.map((x,j)=>[x,'f'+i+j]),...s.x.map((x,j)=>[x,'x'+i+j])].sort((a,b)=>(a[0].length*7%5)-(b[0].length*7%5));items.forEach(it=>{h+=R(it[1],it[0])});st.push({t:s.f.map((x,j)=>'f'+i+j),s:s.s,w:s.w,n:nx})}
 else{const ord=s.a.map((x,j)=>j);const hs=(g.k||g.t||'').length*3+i*5+(s.m||'').length;const rot=hs%ord.length;ord.push(...ord.splice(0,rot));if(ord[0]===0&&ord.length>1)ord.push(ord.shift());ord.forEach(j=>{h+=R('c'+i+j,s.a[j])});st.push({t:'c'+i+'0',s:s.s||'Tap the safest choice.',w:s.w,n:nx})}
 scr[id]=h});
 scr.ok=OK('Well done ✓')+MG('<b>Remember</b><br>'+g.rem.map(x=>'• '+x).join('<br>'));
 const cards=[g.goal].concat(g.steps.map(s=>s.f?'Good habits: '+s.f.join('; ')+'. '+(s.w||''):'Situation: '+strip(s.m)+' Best choice: '+s.a[0]+'. '+(s.w||''))).concat(g.rem.map(x=>'Remember: '+x));
-SC[g.k]={t:g.t,goal:g.goal,start:'s0',scr,st,ep:g.ep,real:g.real,cards};QZ[g.k]=(g.qz||[]).concat(AUTOQ(g))})}
+const gd=g.steps.map(s=>s.f?s.f.slice(0,2):(s.a?[s.a[0]]:[])),bd=g.steps.map(s=>s.f?(s.x&&s.x[0]):(s.a&&s.a[1]));const cs={},cst=[];
+const okc=g.steps.map((s,i)=>bd[i]?i:-1).filter(i=>i>=0);
+okc.forEach((i,q)=>{const s=g.steps[i];let gs=gd[i].slice();for(let t=1;gs.length<2&&t<=g.steps.length;t++){const o2=gd[(i+t)%g.steps.length];if(o2&&o2[0]&&gs.indexOf(o2[0])<0)gs.push(o2[0])}if(gs.length<2)return;
+const opts=[[bd[i],'h'+q+'0'],[gs[0],'h'+q+'1'],[gs[1],'h'+q+'2']];const rot=(q*2+g.t.length)%3;const M=opts.slice(rot).concat(opts.slice(0,rot));
+const nx=q+1<okc.length?'h'+(q+1):'hok';cs['h'+q]=(q?OK('Good ✓'):'')+MG(s.m+'<br><b>Now turn it around: tap the choice that is NOT a good idea.</b>')+M.map(x=>R(x[1],x[0])).join('');cst.push({t:'h'+q+'0',s:'Tap the choice that is NOT a good idea.',w:'That one is fine. Look for the choice that could cause a problem.',n:nx})});
+if(cst.length>=2){cs.hok=scr.ok;}
+SC[g.k]={t:g.t,goal:g.goal,start:'s0',scr,st,ep:g.ep,real:g.real,cards,ch:cst.length>=2?{start:'h0',scr:cs,st:cst}:null};const nm=t=>strip(String(t)).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().toLowerCase(),sm=g.steps.map(x=>nm(x.m));
+const hq=(g.qz||[]),fresh=hq.filter(x=>{const q=nm(x[0]);if(q.length<22&&/^which (is|often|one|of)/.test(q))return false;return !sm.some(m=>m&&(m.includes(q)||q.includes(m)))}),au=AUTOQ(g);
+let qq=fresh.concat(au);if(qq.length<4)qq=qq.concat(hq.filter(x=>fresh.indexOf(x)<0)).slice(0,Math.max(4,qq.length));QZ[g.k]=qq})}
 
 GSC2.push(
 {k:'aiboom',t:'Where AI is now: the AI boom',goal:'Understand what AI can do today, why it is everywhere, and why we must stay careful.',steps:[
@@ -7423,7 +7436,7 @@ function sideHint(ok,s){const h=$('sidehint');if(!h)return;h.classList.toggle('b
 function openLesson(k){const t=k.slice(2),d=LESSONS[t];if(!d)return;key=k;S={t,goal:'Lesson',cards:d[0],q:d[1],real:d[2],scr:{},st:[],ep:''};STGc=STG_L;$('home').hidden=true;$('dev').hidden=false;$('dt').textContent=t;$('dg').textContent='A structured lesson with a quiz and real-world practice.';$('mW').parentElement.hidden=true;conf=(P.m[k]&&P.m[k].c)||0;setStage(0);$('mt').textContent='Lesson · about 20 minutes';scrollTo(0,0);$('dt').tabIndex=-1;$('dt').focus()}
 function openDev(k){if(String(k).startsWith('L:')){openLesson(k);return}if(!SC[k])return;STGc=LAB[k]?STGLB:(CD[k]||SCR[k])?STGCD:TH[k]?STGTH:SIM[k]?STGSM:PG[k]?STGD:STG;const sc=$('scene');const go=()=>{key=k;S=SC[k];$('home').hidden=true;$('dev').hidden=false;$('dt').textContent=S.t;tx();$('dg').textContent=S.goal;$('frame').classList.toggle('phone',false);sc.classList.remove('zoom');$('mW').parentElement.hidden=true;conf=(P.m[k]&&P.m[k].c)||0;window.stMore=false;setStage((TH[k]||SIM[k]||CD[k]||SCR[k]||LAB[k])&&P.m[k]?3:Math.max(0,STGc.findIndex(x=>x[0]==='try')));$('mt').textContent='Your lesson';scrollTo(0,0);$('dt').tabIndex=-1;$('dt').focus()};
 go()}
-function start(m){tok++;clearTimeout(ht);mode=m;si=0;miss=0;paused=false;$('pa').textContent='⏸ Pause';$('end').hidden=true;fb(0,'');$('pg').style.width='0';render(S.start);
+function start(m){if(SC[key]&&(S===SC[key]||S._ch))S=(chal&&m==='try'&&SC[key].ch)?Object.assign({_ch:1},SC[key],SC[key].ch):SC[key];tok++;clearTimeout(ht);mode=m;si=0;miss=0;paused=false;$('pa').textContent='⏸ Pause';$('end').hidden=true;fb(0,'');$('pg').style.width='0';render(S.start);
 $('mW').classList.toggle('on',m==='watch');$('mT').classList.toggle('on',m==='try');$('mW').setAttribute('aria-pressed',m==='watch');$('mT').setAttribute('aria-pressed',m==='try');
 $('cur').style.display=m==='watch'?'':'none';$('pa').hidden=m!=='watch';$('sp').hidden=m!=='watch';$('hn').hidden=m!=='try'||chal;
 $('cur').style.transition=`transform ${1*spd}s ease`;$('cur').style.transform='translate(30px,30px)';
