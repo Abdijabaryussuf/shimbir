@@ -7600,7 +7600,7 @@ pgd('pwm','Practice: strong password','login.practice.example',[H('Create a pass
 pgd('social','Practice: privacy settings','social.practice.example',[H('Settings.'),TG('a','Friends only',1),TG('b','Show my address',0),TG('c','Accept requests from strangers',0)]);
 pgd('perm','Practice: app permissions','apps.practice.example',[H('A flashlight app asks for permissions.'),TG('a','Camera flash',1),TG('b','Contacts',0),TG('c','Microphone',0),TG('d','Location',0)]);
 /* engine */
-const STGD=[STG[0],STG[1],STG[2],['demo','Practice page',5],...STG.slice(3)];
+const STGD=STG;
 function pgHtml(c,k){const o=PG[k];let h='';o.p.forEach((p,pi)=>{const id='pg'+pi;
 if(p.c==='text')h+=`<div class='pgt'>${p.h}</div>`;
 else if(p.c==='items')h+=`<div class='pgi' data-p='${pi}'>`+p.r.map((r,i)=>`<div class='pgrow' data-i='${i}'><span aria-hidden='true' style='font-size:1.6rem'>${r[0]}</span><b>${r[1]}</b><span>$${r[2].toFixed(2)}</span><span class='pgq'><button data-d='-1' aria-label='Fewer ${r[1]}'>−</button><output aria-live='polite'>${r[3]}</output><button data-d='1' aria-label='More ${r[1]}'>+</button></span><button data-d='x' aria-label='Remove ${r[1]}'>🗑</button></div>`).join('')+`</div>`;
@@ -7666,7 +7666,7 @@ return {PG,STGD,showPage}})();const PG=PGX.PG,STGD=PGX.STGD,showPage=PGX.showPag
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 /* ---------- LABS engine: attack theatre and scenario simulator ---------- */
 const STGTH=[STG[0],STG[1],STG[2],['theatre','Watch the attack animation',5],...STG.slice(3)];
-const STGSM=[STG[0],STG[1],STG[2],['sim','Play the scenario',5],...STG.slice(3)];
+const STGSM=STG;
 function labStar(n){try{P.pg=P.pg||{};P.pg[key]=Math.max(P.pg[key]||0,n);save();updRank()}catch(e){}}
 function showTheatre(){const o=TH[key];if(!o)return;$('stT').hidden=false;const n=o.s.length,na=o.a.length,X=j=>((j+.5)/na*100)+'%';let i=-1,sp=1,pl=false,rd=false,fin=false;
 $('stT').innerHTML=`<h2>${o.t}</h2><p>${o.intro}</p><div class='thst' role='img' aria-label='Animation with ${na} characters: ${o.a.map(a=>a[1]).join(', ')}.'>${o.a.map((a,j)=>`<div class='tha' data-j='${j}' style='left:${X(j)}'><span aria-hidden='true'>${a[0]}</span><b>${a[1]}</b></div>`).join('')}<div class='thp' id='thp' aria-hidden='true'></div></div><div class='thbar'><i id='thbi'></i></div><div><span class='thtag' id='thtag'></span></div><p class='thsay' id='thsay' aria-live='polite'>Press Play to begin.</p><div id='thm'></div><div id='thf'></div>
