@@ -1524,7 +1524,7 @@ const AQP={r:[],w:[]};
 function AUTOQ(g){const o=[];const h=String(g.k||g.t||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0),tt=g.t.replace(/^Practice:\s*/i,'');
 const far=(arr,own,n)=>{const out=[];for(let t=0;t<arr.length&&out.length<n;t++){const x=arr[(h*7+t*13+t*t)%arr.length];if(x&&own.indexOf(x)<0&&out.indexOf(x)<0&&x.length<150)out.push(x)}return out};
 g.rem.slice(0,3).forEach((r,ri)=>{const d=far(AQP.r,g.rem,2);if(d.length===2)o.push([['Which reminder goes with: '+tt+(/\?$/.test(tt)?'':'?'),'Which of these is also advice from this lesson?','Pick the tip that belongs to this lesson.'][ri],r,d[0],d[1],'That is the tip taught in this lesson.'])});
-let nw=0;g.steps.forEach(s=>{if(nw>=2||!s.w||s.f||!s.a)return;const d=far(AQP.w,[s.w],2);if(d.length===2){o.push(['Why is this the better choice: “'+s.a[0].replace(/[.!?]+$/,'')+'”?',s.w,d[0],d[1],'That is the reason given in the lesson.']);nw++}});
+let nw=0;g.steps.forEach(s=>{if(g.noWhy||nw>=2||!s.w||s.f||!s.a)return;const d=far(AQP.w,[s.w],2);if(d.length===2){o.push(['Why is this the better choice: “'+s.a[0].replace(/[.!?]+$/,'')+'”?',s.w,d[0],d[1],'That is the reason given in the lesson.']);nw++}});
 if(o.length<3)g.steps.forEach((s,i)=>{if(o.length>=3||s.f||!s.a)return;o.push([strip(s.m),s.a[0],s.a[1],s.a[2],s.w||''])});
 return o}
 function GEN(arr){arr.forEach(g=>{g.rem.forEach(x=>AQP.r.push(x));g.steps.forEach(x=>x.w&&AQP.w.push(x.w))});arr.forEach(g=>{const scr={},st=[];const n=g.steps.length;
@@ -1534,9 +1534,9 @@ else{const ord=s.a.map((x,j)=>j);const hs=(g.k||g.t||'').length*3+i*5+(s.m||'').
 scr[id]=h});
 scr.ok=OK('Well done ✓')+MG('<b>Remember</b><br>'+g.rem.map(x=>'• '+x).join('<br>'));
 const cards=[g.goal].concat(g.steps.map(s=>s.f?'Good habits: '+s.f.join('; ')+'. '+(s.w||''):'Situation: '+strip(s.m)+' Best choice: '+s.a[0]+'. '+(s.w||''))).concat(g.rem.map(x=>'Remember: '+x));
-const gd=g.steps.map(s=>s.f?s.f.slice(0,2):(s.a?[s.a[0]]:[])),bd=g.steps.map(s=>s.f?(s.x&&s.x[0]):(s.a&&s.a[1]));const cs={},cst=[];
-const okc=g.steps.map((s,i)=>bd[i]?i:-1).filter(i=>i>=0);
-okc.forEach((i,q)=>{const s=g.steps[i];let gs=gd[i].slice();for(let t=1;gs.length<2&&t<=g.steps.length;t++){const o2=gd[(i+t)%g.steps.length];if(o2&&o2[0]&&gs.indexOf(o2[0])<0)gs.push(o2[0])}if(gs.length<2)return;
+const CS=g.chs||g.steps;const gd=CS.map(s=>s.f?s.f.slice(0,2):(s.a?[s.a[0]]:[])),bd=CS.map(s=>s.f?(s.x&&s.x[0]):(s.a&&s.a[1]));const cs={},cst=[];
+const okc=CS.map((s,i)=>bd[i]?i:-1).filter(i=>i>=0);
+okc.forEach((i,q)=>{const s=CS[i];let gs=gd[i].slice();for(let t=1;gs.length<2&&t<=CS.length;t++){const o2=gd[(i+t)%CS.length];if(o2&&o2[0]&&gs.indexOf(o2[0])<0)gs.push(o2[0])}if(gs.length<2)return;
 const opts=[[bd[i],'h'+q+'0'],[gs[0],'h'+q+'1'],[gs[1],'h'+q+'2']];const rot=(q*2+g.t.length)%3;const M=opts.slice(rot).concat(opts.slice(0,rot));
 const nx=q+1<okc.length?'h'+(q+1):'hok';cs['h'+q]=(q?OK('Good ✓'):'')+MG(s.m+'<br><b>Now turn it around: tap the choice that is NOT a good idea.</b>')+M.map(x=>R(x[1],x[0])).join('');cst.push({t:'h'+q+'0',s:'Tap the choice that is NOT a good idea.',w:'That one is fine. Look for the choice that could cause a problem.',n:nx})});
 if(cst.length>=2){cs.hok=scr.ok;}
@@ -2973,9 +2973,13 @@ SRD(["web", "Ransomware", ["s:Ransomware locks the files on your computer."]],"B
 SRD(["web", "Spyware", ["s:A keylogger may have copied your password."]],"Best defence?",["Use 2-step verification so a stolen password is not enough", "Second step blocks the thief."],["Use the same password everywhere", "Worst idea."],["Write passwords on the screen", "No."]),
 SRD(["web", "Phishing attachments", ["t:Invoice attached. Open it now to avoid penalties."]],"Best defence?",["Do not open unexpected attachments. Check with the sender another way", "Attachments carry malware."],["Open it quickly", "That is what they want."],["Forward it to friends", "No."])]);
 
-Object.keys(SIM).forEach(k=>{const o=SIM[k];
-GSC2.push({k,t:o.t,goal:o.intro,steps:o.r.map(x=>_c('<b>'+strip(x.c[2].join(' ')).slice(0,170)+'</b> '+x.q,x.g[0],x.b[0][0],x.b[1][0],x.g[1])),
-rem:o.tips,ep:'You practised the right moves.',real:['Teach one tip from this scenario to a friend.','Practise the first move aloud: “I will call you back.”','Save the numbers you can trust in your phone.'],qz:o.r.slice(0,3).map(x=>[x.q,x.g[0],x.b[0][0],x.b[1][0]])})});})();
+const TPL=[];Object.keys(SIM).forEach(k=>(SIM[k].tips||[]).forEach(t=>TPL.push(t)));
+Object.keys(SIM).forEach(k=>{const o=SIM[k];const h=k.split('').reduce((a,c)=>a+c.charCodeAt(0),0),ttl=o.t.replace(/^Practice:\s*/i,'').replace(/\?$/,'');
+const far=n=>{const out=[];for(let t=0;t<TPL.length&&out.length<n;t++){const x=TPL[(h*5+t*11+t*t)%TPL.length];if(x&&o.tips.indexOf(x)<0&&out.indexOf(x)<0)out.push(x)}return out};
+const st=[];
+o.tips.slice(0,3).forEach((t,i)=>{const d=far(2);if(d.length===2)st.push(_c(['Your friend asks for one tip about “'+ttl+'”. Which would you share?','Which of these would you tell a neighbour about “'+ttl+'”?','Which advice goes with “'+ttl+'”?'][i],t,d[0],d[1],'That tip belongs to this lesson.'))});
+if(st.length<2)o.r.forEach(x=>st.push(_c('<b>'+strip(x.c[2].join(' ')).slice(0,170)+'</b> '+x.q,x.g[0],x.b[0][0],x.b[1][0],x.g[1])));
+GSC2.push({k,t:o.t,goal:o.intro,steps:st,chs:o.r.map(x=>_c('<b>'+strip(x.c[2].join(' ')).slice(0,170)+'</b> '+x.q,x.g[0],x.b[0][0],x.b[1][0],x.g[1])),noWhy:1,rem:o.tips,ep:'You can now help a friend with this too.',real:['Teach one tip from this scenario to a friend.','Practise the first move aloud: “I will call you back.”','Save the numbers you can trust in your phone.'],qz:[]})});})();
 
 XSC('b1','xb1a','Charging and caring for your device','Keep a device powered, cool and safe.',[
 ['Your phone says 10% battery. What is the kind thing to do?','Plug it in with its own charger soon','Ignore it until it turns off','Use any cable that fits'],
